@@ -177,11 +177,19 @@ This program will be coded using React and React Router
 Components
 
 App: State	
+
+
 Header: This will have the search bar and some general info like current block height - Props
+
 Home: This will be the landing page that shows latest blocks and transactions - Props /
+
 Block: This will show block summary data and the list of transactions contained - Props /block/:hash
+
 Transaction: This will show transaction summary data and the list of inputs and outputs - Props /transaction/:txid
+
 Address: This will show transaction history into and out of the address - Props /address/:address
+
 Asset: This will show transaction history for the asset - Props /asset/:assetname
+
 
 
