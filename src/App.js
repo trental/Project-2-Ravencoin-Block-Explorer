@@ -3,6 +3,7 @@ import './App.css';
 import { Route, Link } from 'react-router-dom';
 import Home from './components/Home/Home';
 import Transaction from './components/Transaction/Transaction';
+import Block from './components/Block/Block';
 
 const numTransactions = 10;
 const numBlocks = 5;
@@ -14,11 +15,10 @@ class App extends Component {
 			transactions: [],
 			transaction: '',
 			blocks: [],
-			block: 0,
+			block: { tx: [] }, // include tx array for render before data load
+			search: '',
 		};
 	}
-
-	io() {}
 
 	addTransaction(newTransaction) {
 		const newTransactionsList = [newTransaction, ...this.state.transactions];
@@ -44,8 +44,11 @@ class App extends Component {
 		});
 	}
 
-	setBlock(blockHeight) {
-		this.setState({ block: blockHeight });
+	setBlock(blockHash) {
+		// this.setState({ block: blockHeight });
+		this.getBlockByHash(blockHash)
+			.then((blockData) => this.setState({ block: blockData }))
+			.catch((error) => console.error(error));
 	}
 
 	getTransaction(txHash) {
@@ -57,7 +60,7 @@ class App extends Component {
 				.then((data) => {
 					resolve(data);
 				})
-				.catch((error) => reject(error));
+				.catch((error) => {});
 		});
 	}
 
@@ -76,7 +79,7 @@ class App extends Component {
 				.then((data) => {
 					resolve(data.blockHash);
 				})
-				.catch((error) => reject(error));
+				.catch((error) => {});
 		});
 	}
 
@@ -89,7 +92,7 @@ class App extends Component {
 				.then((data) => {
 					resolve(data);
 				})
-				.catch((error) => reject(error));
+				.catch((error) => {});
 		});
 	}
 
@@ -146,7 +149,15 @@ class App extends Component {
 					})
 					.catch((error) => console.log(error));
 			})
-			.catch((error) => console.error(error));
+			.catch((error) => {
+				console.error(error);
+			});
+	}
+
+	io() {
+		// this lazy function does nothing
+		// but satisfies React when React wants to find a this.io function before
+		// loading the websocket stuff
 	}
 
 	componentDidMount() {
@@ -164,6 +175,7 @@ class App extends Component {
 		setTimeout(function () {
 			const room = 'inv';
 
+			// react really doesn't like this unless there is a lazy this.io function above
 			const socket = this.io('https://ravenexplorer.net');
 
 			socket.on('connect', function () {
@@ -174,22 +186,51 @@ class App extends Component {
 				originalThis
 					.getTransaction(txData.txid)
 					.then((txData) => originalThis.addTransaction(txData))
-					.catch((error) => console.log(error));
+					.catch((error) => {});
 			});
 			socket.on('block', function (blockHash) {
 				originalThis
 					.getBlockByHash(blockHash)
 					.then((blockData) => originalThis.addBlock(blockData))
-					.catch((error) => console.log(error));
+					.catch((error) => {});
 			});
 		}, 500); // delay here so that the socket js file can be loaded from remote
+	}
+
+	handleChange(event) {
+		this.setState(
+			{ [event.target.name]: event.target.value },
+			this.speculativeSearch
+		);
+	}
+
+	speculativeSearch() {
+		console.log(this.state.search);
+		this.getBlockByHash(this.state.search)
+			.then((data) => console.log(data))
+			.catch((error) => {});
+		this.getTransaction(this.state.search)
+			.then((data) => console.log(data))
+			.catch((error) => {});
+		if (typeof this.state.search === 'number') {
+			this.getBlockByHeight(this.state.search)
+				.then((blockHash) => {
+					this.getBlockByHash(blockHash)
+						.then((blockData) => console.log(blockData))
+						.catch((error) => {});
+				})
+				.catch((error) => {});
+		}
 	}
 
 	render() {
 		return (
 			<div>
 				<nav>
-					<Link to='/'></Link>
+					<input
+						placeholder='Search'
+						onChange={this.handleChange.bind(this)}
+						name='search'></input>
 				</nav>
 				<main>
 					<Route
@@ -204,13 +245,24 @@ class App extends Component {
 					/>
 					<Route
 						path='/tx/:txHash'
-						exact
 						render={(routerProps) => {
 							return (
 								<Transaction
 									match={routerProps.match}
 									setTransaction={this.setTransaction.bind(this)}
 									transaction={this.state.transaction}
+								/>
+							);
+						}}
+					/>
+					<Route
+						path='/block/:blockHash'
+						render={(routerProps) => {
+							return (
+								<Block
+									match={routerProps.match}
+									setBlock={this.setBlock.bind(this)}
+									block={this.state.block}
 								/>
 							);
 						}}
