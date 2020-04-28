@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { Component } from 'react';
 import './App.css';
 import { Route, Link } from 'react-router-dom';
 import Home from './components/Home/Home.js';
 
 const numTransactions = 10;
 const numBlocks = 5;
-class App extends React.Component {
+class App extends Component {
 	constructor(props) {
 		super(props);
 
@@ -26,11 +26,8 @@ class App extends React.Component {
 		while (newTransactionsList.length > numTransactions) {
 			newTransactionsList.pop();
 		}
-		// this.setState({
-		// 	transactions: newTransactionsList,
-		// });
 
-		console.log(typeof newTransactionsList);
+		this.setState({ transactions: newTransactionsList });
 	}
 
 	addBlock(newBlockData) {
@@ -52,7 +49,6 @@ class App extends React.Component {
 
 	getTransaction(txHash) {
 		// returns transaction data based on transaction id
-		console.log(txHash);
 		return new Promise((resolve, reject) => {
 			const transactionURL = 'https://ravenexplorer.net/api/tx/';
 			fetch(transactionURL + txHash)
@@ -81,7 +77,6 @@ class App extends React.Component {
 		// returns block detail when looking up by hash
 		return new Promise((resolve, reject) => {
 			const blockHashURL = 'https://ravenexplorer.net/api/block/';
-			console.log(blockHashURL + blockHash);
 			fetch(blockHashURL + blockHash)
 				.then((response) => response.json())
 				.then((data) => {
@@ -104,7 +99,6 @@ class App extends React.Component {
 				currentHeight = data.info.blocks;
 				this.getBlockByHeight(currentHeight - 4)
 					.then((blockHash) => {
-						console.log(blockHash);
 						this.getBlockByHash(blockHash)
 							.then((blockData) => this.addBlock(blockData))
 							.catch((error) => console.log(error));
@@ -113,7 +107,6 @@ class App extends React.Component {
 				currentApp
 					.getBlockByHeight(currentHeight - 3)
 					.then((blockHash) => {
-						console.log(blockHash);
 						currentApp
 							.getBlockByHash(blockHash)
 							.then((blockData) => currentApp.addBlock(blockData))
@@ -123,7 +116,6 @@ class App extends React.Component {
 				currentApp
 					.getBlockByHeight(currentHeight - 2)
 					.then((blockHash) => {
-						console.log(blockHash);
 						currentApp
 							.getBlockByHash(blockHash)
 							.then((blockData) => currentApp.addBlock(blockData))
@@ -133,7 +125,6 @@ class App extends React.Component {
 				currentApp
 					.getBlockByHeight(currentHeight - 1)
 					.then((blockHash) => {
-						console.log(blockHash);
 						currentApp
 							.getBlockByHash(blockHash)
 							.then((blockData) => currentApp.addBlock(blockData))
@@ -143,7 +134,6 @@ class App extends React.Component {
 				currentApp
 					.getBlockByHeight(currentHeight)
 					.then((blockHash) => {
-						console.log(blockHash);
 						currentApp
 							.getBlockByHash(blockHash)
 							.then((blockData) => currentApp.addBlock(blockData))
