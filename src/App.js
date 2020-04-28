@@ -1,12 +1,15 @@
 import React, { Component } from 'react';
 import './App.css';
-import { Route, Link } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 import Home from './components/Home/Home';
 import Transaction from './components/Transaction/Transaction';
 import Block from './components/Block/Block';
+import Header from './components/Header/Header';
 
 const numTransactions = 10;
 const numBlocks = 5;
+const apiUrl = 'https://ravenexplorer.net';
+// const apiUrl = 'http://192.168.1.21:3100';
 class App extends Component {
 	constructor(props) {
 		super(props);
@@ -17,6 +20,7 @@ class App extends Component {
 			blocks: [],
 			block: { tx: [] }, // include tx array for render before data load
 			search: '',
+			searchMatch: [],
 		};
 	}
 
@@ -45,7 +49,6 @@ class App extends Component {
 	}
 
 	setBlock(blockHash) {
-		// this.setState({ block: blockHeight });
 		this.getBlockByHash(blockHash)
 			.then((blockData) => this.setState({ block: blockData }))
 			.catch((error) => console.error(error));
@@ -54,13 +57,13 @@ class App extends Component {
 	getTransaction(txHash) {
 		// returns transaction data based on transaction id
 		return new Promise((resolve, reject) => {
-			const transactionURL = 'https://ravenexplorer.net/api/tx/';
+			const transactionURL = apiUrl + '/api/tx/';
 			fetch(transactionURL + txHash)
 				.then((response) => response.json())
 				.then((data) => {
 					resolve(data);
 				})
-				.catch((error) => {});
+				.catch((error) => reject(error));
 		});
 	}
 
@@ -73,31 +76,31 @@ class App extends Component {
 	getBlockByHeight(blockHeight) {
 		// returns block hash based on eight
 		return new Promise((resolve, reject) => {
-			const blockHeightURL = 'https://ravenexplorer.net/api/block-index/';
+			const blockHeightURL = apiUrl + '/api/block-index/';
 			fetch(blockHeightURL + blockHeight)
 				.then((response) => response.json())
 				.then((data) => {
 					resolve(data.blockHash);
 				})
-				.catch((error) => {});
+				.catch((error) => reject(error));
 		});
 	}
 
 	getBlockByHash(blockHash) {
 		// returns block detail when looking up by hash
 		return new Promise((resolve, reject) => {
-			const blockHashURL = 'https://ravenexplorer.net/api/block/';
+			const blockHashURL = apiUrl + '/api/block/';
 			fetch(blockHashURL + blockHash)
 				.then((response) => response.json())
 				.then((data) => {
 					resolve(data);
 				})
-				.catch((error) => {});
+				.catch((error) => reject(error));
 		});
 	}
 
 	addFiveMostRecentBlocks() {
-		const statusURL = 'https://ravenexplorer.net/api/status';
+		const statusURL = apiUrl + '/api/status';
 		let currentHeight = 0;
 		let currentApp = this;
 
@@ -176,7 +179,7 @@ class App extends Component {
 			const room = 'inv';
 
 			// react really doesn't like this unless there is a lazy this.io function above
-			const socket = this.io('https://ravenexplorer.net');
+			const socket = this.io(apiUrl + '/');
 
 			socket.on('connect', function () {
 				// Join the room.
@@ -186,51 +189,116 @@ class App extends Component {
 				originalThis
 					.getTransaction(txData.txid)
 					.then((txData) => originalThis.addTransaction(txData))
-					.catch((error) => {});
+					.catch((error) => console.log(error));
 			});
 			socket.on('block', function (blockHash) {
 				originalThis
 					.getBlockByHash(blockHash)
 					.then((blockData) => originalThis.addBlock(blockData))
-					.catch((error) => {});
+					.catch((error) => console.log(error));
 			});
 		}, 500); // delay here so that the socket js file can be loaded from remote
 	}
 
 	handleChange(event) {
-		this.setState(
-			{ [event.target.name]: event.target.value },
-			this.speculativeSearch
-		);
+		this.setState({ [event.target.name]: event.target.value }, () => {
+			this.clearThenSpeculativeSearch();
+		});
+	}
+
+	clearThenSpeculativeSearch() {
+		this.setState({ searchMatch: [] }, () => {
+			this.speculativeSearch();
+		});
+	}
+
+	clearSearch() {
+		this.setState({ search: [] }, () => {
+			this.setState({ searchMatch: [] });
+		});
 	}
 
 	speculativeSearch() {
-		console.log(this.state.search);
-		this.getBlockByHash(this.state.search)
-			.then((data) => console.log(data))
-			.catch((error) => {});
-		this.getTransaction(this.state.search)
-			.then((data) => console.log(data))
-			.catch((error) => {});
-		if (typeof this.state.search === 'number') {
-			this.getBlockByHeight(this.state.search)
-				.then((blockHash) => {
-					this.getBlockByHash(blockHash)
-						.then((blockData) => console.log(blockData))
-						.catch((error) => {});
+		// search for Block, Transaction, Address, or Asset and build an array of all possible matches
+		if (this.state.search !== '') {
+			this.getBlockByHash(this.state.search)
+				.then((data) => {
+					if (JSON.stringify(data) !== '["Not found"]') {
+						let newBlockByHash = {
+							hash: data.hash,
+							blockHeight: data.height,
+							transactions: data.tx.length,
+						};
+						this.addSearchMatch('block', newBlockByHash);
+					}
 				})
-				.catch((error) => {});
+				.catch((error) => console.log(error));
+			this.getTransaction(this.state.search)
+				.then((data) => {
+					if (JSON.stringify(data) !== '["Not found"]') {
+						let newTx = {
+							hash: data.txid,
+							blockHeight: data.blockHeight,
+							valueOut: data.valueOut,
+						};
+						this.addSearchMatch('tx', newTx);
+					}
+				})
+				.catch((error) => console.log(error));
+			if (!isNaN(this.state.search)) {
+				this.getBlockByHeight(this.state.search)
+					.then((blockHash) => {
+						this.getBlockByHash(blockHash)
+							.then((blockHash) => {
+								if (JSON.stringify(blockHash) !== '["Not found"]') {
+									let newBlockByHash = {
+										hash: blockHash.hash,
+										blockHeight: blockHash.height,
+										transactions: blockHash.tx.length,
+									};
+									this.addSearchMatch('block', newBlockByHash);
+								}
+							})
+							.catch((error) => console.log(error));
+					})
+					.catch((error) => console.log(error));
+			}
 		}
+	}
+
+	searchClicked(props) {
+		if (props.target.dataset.category === 'block') {
+			this.setBlock(props.target.dataset.hash);
+		} else if (props.target.dataset.category === 'tx') {
+			this.setTransaction(props.target.dataset.hash);
+		}
+		this.clearSearch();
+	}
+
+	addSearchMatch(category, object) {
+		const newSearchObject = {
+			category: category,
+			object: object,
+		};
+		const newSearchMatchList = [...this.state.searchMatch];
+
+		newSearchMatchList.push(newSearchObject);
+
+		this.setState({
+			searchMatch: newSearchMatchList,
+		});
 	}
 
 	render() {
 		return (
 			<div>
 				<nav>
-					<input
-						placeholder='Search'
-						onChange={this.handleChange.bind(this)}
-						name='search'></input>
+					<Header
+						handleChange={this.handleChange.bind(this)}
+						searchMatch={this.state.searchMatch}
+						searchClicked={this.searchClicked.bind(this)}
+						search={this.state.search}
+					/>
 				</nav>
 				<main>
 					<Route
@@ -273,5 +341,3 @@ class App extends Component {
 	}
 }
 export default App;
-
-//const socket = io("https://ravenexplorer.net");
