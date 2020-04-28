@@ -7,19 +7,32 @@ class Transaction extends Component {
 	}
 
 	render() {
-		const vinList = this.props.transaction.vin.map((addrIn) => (
-			<p>
-				<Link to={'/addr/' + addrIn.addr}>{addrIn.addr}</Link> {addrIn.value}
-			</p>
-		));
-		const voutList = this.props.transaction.vout.map((addrOut) => (
-			<p>
-				<Link to={'/addr/' + addrOut.scriptPubKey.addresses[0]}>
-					{addrOut.scriptPubKey.addresses[0]}
-				</Link>{' '}
-				{addrOut.value}
-			</p>
-		));
+		const vinList = this.props.transaction.vin.map((addrIn) => {
+			if (addrIn.coinbase) {
+				return <p>No Inputs, New Coins</p>;
+			} else {
+				return (
+					<p>
+						<Link to={'/addr/' + addrIn.addr}>{addrIn.addr}</Link>{' '}
+						{addrIn.value}
+					</p>
+				);
+			}
+		});
+		const voutList = this.props.transaction.vout.map((addrOut) => {
+			if (addrOut.scriptPubKey.addresses) {
+				return (
+					<p>
+						<Link to={'/addr/' + addrOut.scriptPubKey.addresses[0]}>
+							{addrOut.scriptPubKey.addresses[0]}
+						</Link>{' '}
+						{addrOut.value}
+					</p>
+				);
+			} else {
+				return <p>OP RETURN</p>;
+			}
+		});
 		return (
 			<>
 				<div>
