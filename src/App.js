@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import './App.css';
 import { Route, Link } from 'react-router-dom';
-import Home from './components/Home/Home.js';
+import Home from './components/Home/Home';
+import Transaction from './components/Transaction/Transaction';
 
 const numTransactions = 10;
 const numBlocks = 5;
@@ -60,6 +61,12 @@ class App extends Component {
 		});
 	}
 
+	setTransaction(txid) {
+		this.getTransaction(txid)
+			.then((txData) => this.setState({ transaction: txData }))
+			.catch((error) => console.error(error));
+	}
+
 	getBlockByHeight(blockHeight) {
 		// returns block hash based on eight
 		return new Promise((resolve, reject) => {
@@ -89,8 +96,6 @@ class App extends Component {
 	addFiveMostRecentBlocks() {
 		const statusURL = 'https://ravenexplorer.net/api/status';
 		let currentHeight = 0;
-		let currentBlocks = [];
-
 		let currentApp = this;
 
 		fetch(statusURL)
@@ -189,12 +194,26 @@ class App extends Component {
 				<main>
 					<Route
 						path='/'
+						exact
 						render={(routerProps) => (
 							<Home
 								transactions={this.state.transactions}
 								blocks={this.state.blocks}
 							/>
 						)}
+					/>
+					<Route
+						path='/tx/:txHash'
+						exact
+						render={(routerProps) => {
+							return (
+								<Transaction
+									match={routerProps.match}
+									setTransaction={this.setTransaction.bind(this)}
+									transaction={this.state.transaction}
+								/>
+							);
+						}}
 					/>
 				</main>
 			</div>
