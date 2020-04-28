@@ -5,6 +5,7 @@ import Home from './components/Home/Home';
 import Transaction from './components/Transaction/Transaction';
 import Block from './components/Block/Block';
 import Header from './components/Header/Header';
+import Address from './components/Address/Address';
 
 const numTransactions = 10;
 const numBlocks = 5;
@@ -16,9 +17,11 @@ class App extends Component {
 
 		this.state = {
 			transactions: [],
-			transaction: '',
+			runningTransactions: [],
+			transaction: { vin: [], vout: [] },
 			blocks: [],
 			block: { tx: [] }, // include tx array for render before data load
+			address: { transactions: [] },
 			search: '',
 			searchMatch: [],
 		};
@@ -46,6 +49,25 @@ class App extends Component {
 		this.setState({
 			blocks: newBlocksList,
 		});
+	}
+
+	getAddress(address) {
+		// returns transaction data based on transaction id
+		return new Promise((resolve, reject) => {
+			const transactionURL = apiUrl + '/api/addr/';
+			fetch(transactionURL + address)
+				.then((response) => response.json())
+				.then((data) => {
+					resolve(data);
+				})
+				.catch((error) => reject(error));
+		});
+	}
+
+	setAddress(address) {
+		this.getAddress(address)
+			.then((data) => this.setState({ address: data }))
+			.catch((error) => console.error(error));
 	}
 
 	setBlock(blockHash) {
@@ -245,6 +267,18 @@ class App extends Component {
 					}
 				})
 				.catch((error) => console.log(error));
+			this.getAddress(this.state.search)
+				.then((data) => {
+					if (JSON.stringify(data) !== '["Not found"]') {
+						let newAddr = {
+							hash: data.addrStr,
+							transactions: data.transactions.length,
+							balance: data.balance,
+						};
+						this.addSearchMatch('addr', newAddr);
+					}
+				})
+				.catch((error) => console.log(error));
 			if (!isNaN(this.state.search)) {
 				this.getBlockByHeight(this.state.search)
 					.then((blockHash) => {
@@ -331,6 +365,18 @@ class App extends Component {
 									match={routerProps.match}
 									setBlock={this.setBlock.bind(this)}
 									block={this.state.block}
+								/>
+							);
+						}}
+					/>
+					<Route
+						path='/addr/:address'
+						render={(routerProps) => {
+							return (
+								<Address
+									match={routerProps.match}
+									setAddress={this.setAddress.bind(this)}
+									address={this.state.address}
 								/>
 							);
 						}}

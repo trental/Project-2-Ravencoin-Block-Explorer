@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 const Header = (props) => {
 	const list = props.searchMatch.map((item) => {
 		return (
-			<div key={item}>
+			<div key={item.object.hash}>
 				{Object.keys(item.object).map((key) => {
 					return (
 						<Link
@@ -25,6 +25,7 @@ const Header = (props) => {
 	});
 	return (
 		<>
+			<Link to='/'>Home</Link>
 			<input
 				placeholder='Search'
 				onChange={props.handleChange.bind(this)}
