@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const RunningTransactions = (props) => {
-	const list = props.transactions.map((tx) => {
+	const list = props.runningTransactions.map((tx) => {
 		return (
 			<p key={tx.txid}>
 				<Link to={'/tx/' + tx.txid}>{tx.txid}</Link> {tx.valueOut} RVN

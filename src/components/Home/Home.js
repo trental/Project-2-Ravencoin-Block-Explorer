@@ -5,8 +5,8 @@ import RunningBlocks from './RunningBlocks';
 const Home = (props) => {
 	return (
 		<div>
-			<RunningBlocks blocks={props.blocks} />
-			<RunningTransactions transactions={props.transactions} />
+			<RunningBlocks runningBlocks={props.runningBlocks} />
+			<RunningTransactions runningTransactions={props.runningTransactions} />
 		</div>
 	);
 };

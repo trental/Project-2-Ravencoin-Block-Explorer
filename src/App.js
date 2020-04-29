@@ -16,30 +16,61 @@ class App extends Component {
 		super(props);
 
 		this.state = {
-			transactions: [],
+			transactions: [{ vin: [], vout: [] }],
 			runningTransactions: [],
-			transaction: { vin: [], vout: [] },
+			transaction: { vin: [], vout: [] }, // include arrays for render before data load
 			blocks: [],
-			block: { tx: [] }, // include tx array for render before data load
+			runningBlocks: [],
+			block: { tx: [] }, // include arrays for render before data load
 			address: { transactions: [] },
 			search: '',
 			searchMatch: [],
 		};
 	}
 
+	addTransactionSet(transactionList) {
+		const workingList = [...this.state.block.tx];
+		const originalThis = this;
+
+		const recursivePullTransaction = (txArray) => {
+			if (txArray.length > 0) {
+				let singleTx = txArray.pop();
+				recursivePullTransaction(txArray);
+				originalThis
+					.getTransaction(singleTx)
+					.then((tx) => originalThis.addTransaction(tx));
+				// console.log(this);
+			}
+		};
+
+		this.setState(
+			{ transactions: [] },
+			recursivePullTransaction(workingList)
+			// console.log('hi')
+		);
+	}
+
 	addTransaction(newTransaction) {
 		const newTransactionsList = [newTransaction, ...this.state.transactions];
+		this.setState({ transactions: newTransactionsList });
+	}
+
+	addRunningTransaction(newTransaction) {
+		const newTransactionsList = [
+			newTransaction,
+			...this.state.runningTransactions,
+		];
 
 		// remove transactions if more than 10 in the list
 		while (newTransactionsList.length > numTransactions) {
 			newTransactionsList.pop();
 		}
 
-		this.setState({ transactions: newTransactionsList });
+		this.setState({ runningTransactions: newTransactionsList });
 	}
 
 	addBlock(newBlockData) {
-		const newBlocksList = [newBlockData, ...this.state.blocks];
+		const newBlocksList = [newBlockData, ...this.state.runningBlocks];
 
 		// remove blocks if more than wanted in the list
 		while (newBlocksList.length > numBlocks) {
@@ -47,7 +78,7 @@ class App extends Component {
 		}
 
 		this.setState({
-			blocks: newBlocksList,
+			runningBlocks: newBlocksList,
 		});
 	}
 
@@ -71,8 +102,16 @@ class App extends Component {
 	}
 
 	setBlock(blockHash) {
+		let originalThis = this;
 		this.getBlockByHash(blockHash)
-			.then((blockData) => this.setState({ block: blockData }))
+			.then((blockData) => {
+				this.setState(
+					{ block: blockData },
+					() => originalThis.addTransactionSet(this.state.block.tx)
+
+					// () => console.log(this.state.block.tx.length)
+				);
+			})
 			.catch((error) => console.error(error));
 	}
 
@@ -210,7 +249,7 @@ class App extends Component {
 			socket.on('tx', function (txData) {
 				originalThis
 					.getTransaction(txData.txid)
-					.then((txData) => originalThis.addTransaction(txData))
+					.then((txData) => originalThis.addRunningTransaction(txData))
 					.catch((error) => console.log(error));
 			});
 			socket.on('block', function (blockHash) {
@@ -340,8 +379,8 @@ class App extends Component {
 						exact
 						render={(routerProps) => (
 							<Home
-								transactions={this.state.transactions}
-								blocks={this.state.blocks}
+								runningTransactions={this.state.runningTransactions}
+								runningBlocks={this.state.runningBlocks}
 							/>
 						)}
 					/>

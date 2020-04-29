@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const RunningBlocks = (props) => {
-	const list = props.blocks.map((block) => {
+	const list = props.runningBlocks.map((block) => {
 		return (
 			<p key={block.height}>
 				<Link to={'/block/' + block.hash}>{block.height}</Link>{' '}
