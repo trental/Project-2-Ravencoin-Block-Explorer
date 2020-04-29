@@ -6,25 +6,31 @@ import Transaction from './components/Transaction/Transaction';
 import Block from './components/Block/Block';
 import Header from './components/Header/Header';
 import Address from './components/Address/Address';
+import Asset from './components/Asset/Asset';
 
 const numTransactions = 10;
-const numBlocks = 5;
+const numBlocks = 10;
+const numRandomAssets = 10;
 const apiUrl = 'https://ravenexplorer.net';
+const totalAssets = 23463;
+const randomAssetURL = '/api/assets?asset=*&size=1&skip=';
+
 // const apiUrl = 'http://192.168.1.21:3100';
 class App extends Component {
 	constructor(props) {
 		super(props);
 
 		this.state = {
-			transactions: [{ vin: [], vout: [] }],
+			transactions: [{ vin: [], vout: [] }], // include arrays for render before data load
 			runningTransactions: [],
 			transaction: { vin: [], vout: [] }, // include arrays for render before data load
-			blocks: [],
 			runningBlocks: [],
 			block: { tx: [] }, // include arrays for render before data load
 			address: { transactions: [] },
 			search: '',
 			searchMatch: [],
+			randomAssets: [],
+			asset: { temp: {} }, // include object for render before data load
 		};
 	}
 
@@ -95,6 +101,29 @@ class App extends Component {
 		});
 	}
 
+	getAsset(asset) {
+		// returns transaction data based on transaction id
+		return new Promise((resolve, reject) => {
+			const transactionURL =
+				apiUrl + '/api/assets?asset=' + asset + '&verbose=true';
+			fetch(transactionURL)
+				.then((response) => response.json())
+				.then((data) => {
+					resolve(data);
+				})
+				.catch((error) => reject(error));
+		});
+	}
+
+	setAsset(asset) {
+		let originalThis = this;
+		this.getAsset(asset)
+			.then((data) => {
+				this.setState({ asset: data });
+			})
+			.catch((error) => console.error(error));
+	}
+
 	setAddress(address) {
 		let originalThis = this;
 		this.getAddress(address)
@@ -160,6 +189,46 @@ class App extends Component {
 				})
 				.catch((error) => reject(error));
 		});
+	}
+
+	getAPIElement(endPoint, item) {
+		return new Promise((resolve, reject) => {
+			console.log(endPoint + item);
+			fetch(apiUrl + endPoint + item)
+				.then((response) => response.json())
+				.then((data) => {
+					resolve(data);
+				})
+				.catch((error) => reject(error));
+		});
+	}
+
+	addStateElement(stateKey, item, position = 'back', limit) {
+		const currArray = [...this.state.statekey];
+		if (position === 'front') {
+			currArray.unshift(item);
+		} else {
+			currArray.push(item);
+		}
+
+		if (currArray.length > limit) {
+		}
+
+		// this.setState([stateKey])
+	}
+
+	addRandomAssets() {
+		let randomNum;
+		let currentApp = this;
+
+		// while (this.state.randomAssets.length < numRandomAssets) {
+		// 	randomNum = Math.floor(Math.random() * totalAssets) + 1;
+		// 	console.log()
+		// }
+
+		this.getAPIElement(randomAssetURL, randomNum).then((data) =>
+			console.log(data)
+		);
 	}
 
 	addFiveMostRecentBlocks() {
@@ -229,38 +298,39 @@ class App extends Component {
 	componentDidMount() {
 		// get five last blocks and populate state
 		this.addFiveMostRecentBlocks();
+		this.addRandomAssets();
 
-		// create web socket
-		const script = document.createElement('script');
-		script.src = 'https://ravenexplorer.net/socket.io/socket.io.js';
-		script.async = true;
-		document.body.appendChild(script);
+		// // create web socket
+		// const script = document.createElement('script');
+		// script.src = 'https://ravenexplorer.net/socket.io/socket.io.js';
+		// script.async = true;
+		// document.body.appendChild(script);
 
-		let originalThis = this;
+		// let originalThis = this;
 
-		setTimeout(function () {
-			const room = 'inv';
+		// setTimeout(function () {
+		// 	const room = 'inv';
 
-			// react really doesn't like this unless there is a lazy this.io function above
-			const socket = this.io(apiUrl + '/');
+		// 	// react really doesn't like this unless there is a lazy this.io function above
+		// 	const socket = this.io(apiUrl + '/');
 
-			socket.on('connect', function () {
-				// Join the room.
-				socket.emit('subscribe', room);
-			});
-			socket.on('tx', function (txData) {
-				originalThis
-					.getTransaction(txData.txid)
-					.then((txData) => originalThis.addRunningTransaction(txData))
-					.catch((error) => console.log(error));
-			});
-			socket.on('block', function (blockHash) {
-				originalThis
-					.getBlockByHash(blockHash)
-					.then((blockData) => originalThis.addBlock(blockData))
-					.catch((error) => console.log(error));
-			});
-		}, 500); // delay here so that the socket js file can be loaded from remote
+		// 	socket.on('connect', function () {
+		// 		// Join the room.
+		// 		socket.emit('subscribe', room);
+		// 	});
+		// 	socket.on('tx', function (txData) {
+		// 		originalThis
+		// 			.getTransaction(txData.txid)
+		// 			.then((txData) => originalThis.addRunningTransaction(txData))
+		// 			.catch((error) => console.log(error));
+		// 	});
+		// 	socket.on('block', function (blockHash) {
+		// 		originalThis
+		// 			.getBlockByHash(blockHash)
+		// 			.then((blockData) => originalThis.addBlock(blockData))
+		// 			.catch((error) => console.log(error));
+		// 	});
+		// }, 500); // delay here so that the socket js file can be loaded from remote
 	}
 
 	handleChange(event) {
@@ -405,6 +475,7 @@ class App extends Component {
 								<Block
 									match={routerProps.match}
 									setBlock={this.setBlock.bind(this)}
+									setAddress={this.setAddress.bind(this)}
 									block={this.state.block}
 									transactions={this.state.transactions}
 								/>
@@ -417,9 +488,22 @@ class App extends Component {
 							return (
 								<Address
 									match={routerProps.match}
+									setBlock={this.setBlock.bind(this)}
 									setAddress={this.setAddress.bind(this)}
 									address={this.state.address}
 									transactions={this.state.transactions}
+								/>
+							);
+						}}
+					/>
+					<Route
+						path='/asset/:assetName'
+						render={(routerProps) => {
+							return (
+								<Asset
+									match={routerProps.match}
+									setAsset={this.setAsset.bind(this)}
+									asset={this.state.asset}
 								/>
 							);
 						}}

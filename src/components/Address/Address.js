@@ -10,7 +10,11 @@ class Address extends Component {
 		return (
 			<div>
 				{this.props.address.addrStr} {this.props.address.balance}
-				<Transactions transactions={this.props.transactions} />
+				<Transactions
+					transactions={this.props.transactions}
+					setAddress={this.props.setAddress}
+					setBlock={this.props.setAddress}
+				/>
 			</div>
 		);
 	}

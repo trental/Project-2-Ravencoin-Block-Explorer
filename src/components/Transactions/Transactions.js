@@ -5,7 +5,11 @@ class Transactions extends Component {
 	render() {
 		const txList = this.props.transactions.map((tx) => (
 			<div>
-				<TransactionItem transaction={tx} />
+				<TransactionItem
+					transaction={tx}
+					setAddress={this.props.setAddress}
+					setBlock={this.props.setAddress}
+				/>
 			</div>
 		));
 		return <>{txList}</>;

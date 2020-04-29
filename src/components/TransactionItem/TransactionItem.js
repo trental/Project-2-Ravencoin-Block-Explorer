@@ -9,7 +9,11 @@ class TransactionItem extends Component {
 			} else {
 				return (
 					<p>
-						<Link to={'/addr/' + addrIn.addr}>{addrIn.addr}</Link>{' '}
+						<Link
+							to={'/addr/' + addrIn.addr}
+							onClick={() => this.props.setAddress(addrIn.addr)}>
+							{addrIn.addr}
+						</Link>{' '}
 						{addrIn.value}
 					</p>
 				);
@@ -19,7 +23,11 @@ class TransactionItem extends Component {
 			if (addrOut.scriptPubKey.addresses) {
 				return (
 					<p>
-						<Link to={'/addr/' + addrOut.scriptPubKey.addresses[0]}>
+						<Link
+							to={'/addr/' + addrOut.scriptPubKey.addresses[0]}
+							onClick={() =>
+								this.props.setAddress(addrOut.scriptPubKey.addresses[0])
+							}>
 							{addrOut.scriptPubKey.addresses[0]}
 						</Link>{' '}
 						{addrOut.value}

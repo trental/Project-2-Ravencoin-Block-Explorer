@@ -12,14 +12,14 @@ class Block extends Component {
 				<div>
 					{this.props.block.hash} {this.props.block.tx.length}
 				</div>
-				<Transactions transactions={this.props.transactions} />
+				<Transactions
+					transactions={this.props.transactions}
+					setAddress={this.props.setAddress}
+					setBlock={this.props.setAddress}
+				/>
 			</>
 		);
 	}
 }
-
-// const Transaction = (props) => {
-// 	return <div>{props.transaction.txid}</div>;
-// };
 
 export default Block;
