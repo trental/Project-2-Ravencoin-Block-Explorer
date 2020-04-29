@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 class Transaction extends Component {
 	componentDidMount() {
-		this.props.setTransaction(this.props.match.params.txHash);
+		this.props.setStateElement('transaction', this.props.match.params.txHash);
 	}
 
 	render() {

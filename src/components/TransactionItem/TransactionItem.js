@@ -11,7 +11,9 @@ class TransactionItem extends Component {
 					<p>
 						<Link
 							to={'/addr/' + addrIn.addr}
-							onClick={() => this.props.setAddress(addrIn.addr)}>
+							onClick={() =>
+								this.props.setStateElement('address', addrIn.addr)
+							}>
 							{addrIn.addr}
 						</Link>{' '}
 						{addrIn.value}
@@ -26,7 +28,10 @@ class TransactionItem extends Component {
 						<Link
 							to={'/addr/' + addrOut.scriptPubKey.addresses[0]}
 							onClick={() =>
-								this.props.setAddress(addrOut.scriptPubKey.addresses[0])
+								this.props.setStateElement(
+									'address',
+									addrOut.scriptPubKey.addresses[0]
+								)
 							}>
 							{addrOut.scriptPubKey.addresses[0]}
 						</Link>{' '}

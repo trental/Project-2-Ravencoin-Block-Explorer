@@ -8,7 +8,8 @@ class Transactions extends Component {
 				<TransactionItem
 					transaction={tx}
 					setAddress={this.props.setAddress}
-					setBlock={this.props.setAddress}
+					setBlock={this.props.setBlock}
+					setStateElement={this.props.setStateElement}
 				/>
 			</div>
 		));

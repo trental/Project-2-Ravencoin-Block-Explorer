@@ -14,6 +14,18 @@ const numRandomAssets = 10;
 const apiUrl = 'https://ravenexplorer.net';
 const totalAssets = 23463;
 const randomAssetURL = '/api/assets?asset=*&size=1&skip=';
+const assetURL = '/api/assets?verbose=true&asset=';
+const addressURL = '/api/addr/';
+const blockIndexURL = '/api/block-index/';
+const blockHashURL = '/api/block/';
+const txURL = '/api/tx/';
+const statusURL = '/api/status?q=getInfo';
+const stateKeyURL = {
+	address: addressURL,
+	asset: assetURL,
+	block: blockHashURL,
+	transaction: txURL,
+};
 
 // const apiUrl = 'http://192.168.1.21:3100';
 class App extends Component {
@@ -21,44 +33,17 @@ class App extends Component {
 		super(props);
 
 		this.state = {
-			transactions: [{ vin: [], vout: [] }], // include arrays for render before data load
-			runningTransactions: [],
 			transaction: { vin: [], vout: [] }, // include arrays for render before data load
-			runningBlocks: [],
+			runningTransactions: [],
 			block: { tx: [] }, // include arrays for render before data load
-			address: { transactions: [] },
+			runningBlocks: [],
+			address: { transactions: [] }, // include arrays for render before data load
+			transactions: [{ vin: [], vout: [] }], // include arrays for render before data load
+			asset: { temp: {} }, // include object for render before data load
+			randomAssets: [],
 			search: '',
 			searchMatch: [],
-			randomAssets: [],
-			asset: { temp: {} }, // include object for render before data load
 		};
-	}
-
-	addTransactionSet(transactionList) {
-		const workingList = [...transactionList];
-		const originalThis = this;
-
-		const recursivePullTransaction = (txArray) => {
-			if (txArray.length > 0) {
-				let singleTx = txArray.pop();
-				recursivePullTransaction(txArray);
-				originalThis
-					.getTransaction(singleTx)
-					.then((tx) => originalThis.addTransaction(tx));
-				// console.log(this);
-			}
-		};
-
-		this.setState(
-			{ transactions: [] },
-			recursivePullTransaction(workingList)
-			// console.log('hi')
-		);
-	}
-
-	addTransaction(newTransaction) {
-		const newTransactionsList = [newTransaction, ...this.state.transactions];
-		this.setState({ transactions: newTransactionsList });
 	}
 
 	addRunningTransaction(newTransaction) {
@@ -75,7 +60,7 @@ class App extends Component {
 		this.setState({ runningTransactions: newTransactionsList });
 	}
 
-	addBlock(newBlockData) {
+	addRunningBlock(newBlockData) {
 		const newBlocksList = [newBlockData, ...this.state.runningBlocks];
 
 		// remove blocks if more than wanted in the list
@@ -88,112 +73,55 @@ class App extends Component {
 		});
 	}
 
-	getAddress(address) {
-		// returns transaction data based on transaction id
-		return new Promise((resolve, reject) => {
-			const transactionURL = apiUrl + '/api/addr/';
-			fetch(transactionURL + address)
-				.then((response) => response.json())
-				.then((data) => {
-					resolve(data);
-				})
-				.catch((error) => reject(error));
-		});
-	}
+	setStateElement(stateKey, item) {
+		let app = this;
+		let url = stateKeyURL[stateKey];
 
-	getAsset(asset) {
-		// returns transaction data based on transaction id
-		return new Promise((resolve, reject) => {
-			const transactionURL =
-				apiUrl + '/api/assets?asset=' + asset + '&verbose=true';
-			fetch(transactionURL)
-				.then((response) => response.json())
-				.then((data) => {
-					resolve(data);
-				})
-				.catch((error) => reject(error));
-		});
-	}
-
-	setAsset(asset) {
-		let originalThis = this;
-		this.getAsset(asset)
+		this.getAPIElement(url, item)
 			.then((data) => {
-				this.setState({ asset: data });
+				this.setState({ [stateKey]: data }, () => {
+					if (['block', 'address'].includes(stateKey)) {
+						app.addTransactionSet(this.state.block.tx);
+					}
+				});
 			})
 			.catch((error) => console.error(error));
 	}
 
-	setAddress(address) {
-		let originalThis = this;
-		this.getAddress(address)
-			.then((data) =>
-				this.setState({ address: data }, () =>
-					originalThis.addTransactionSet(this.state.address.transactions)
-				)
-			)
-			.catch((error) => console.error(error));
+	addTransactionSet(transactionList) {
+		const workingList = [...transactionList];
+		const originalThis = this;
+
+		const recursivePullTransaction = (txArray) => {
+			if (txArray.length > 0) {
+				let singleTx = txArray.pop();
+				recursivePullTransaction(txArray);
+				originalThis
+					.getAPIElement(txURL, singleTx)
+					.then((tx) => originalThis.addTransaction(tx));
+			}
+		};
+
+		this.setState({ transactions: [] }, recursivePullTransaction(workingList));
 	}
 
-	setBlock(blockHash) {
-		let originalThis = this;
-		this.getBlockByHash(blockHash)
-			.then((blockData) => {
-				this.setState({ block: blockData }, () =>
-					originalThis.addTransactionSet(this.state.block.tx)
-				);
-			})
-			.catch((error) => console.error(error));
+	addTransaction(newTransaction) {
+		const newTransactionsList = [newTransaction, ...this.state.transactions];
+		this.setState({ transactions: newTransactionsList });
 	}
 
-	getTransaction(txHash) {
-		// returns transaction data based on transaction id
-		return new Promise((resolve, reject) => {
-			const transactionURL = apiUrl + '/api/tx/';
-			fetch(transactionURL + txHash)
-				.then((response) => response.json())
-				.then((data) => {
-					resolve(data);
-				})
-				.catch((error) => reject(error));
-		});
-	}
-
-	setTransaction(txid) {
-		this.getTransaction(txid)
-			.then((txData) => this.setState({ transaction: txData }))
-			.catch((error) => console.error(error));
-	}
-
-	getBlockByHeight(blockHeight) {
-		// returns block hash based on eight
-		return new Promise((resolve, reject) => {
-			const blockHeightURL = apiUrl + '/api/block-index/';
-			fetch(blockHeightURL + blockHeight)
-				.then((response) => response.json())
-				.then((data) => {
-					resolve(data.blockHash);
-				})
-				.catch((error) => reject(error));
-		});
-	}
-
-	getBlockByHash(blockHash) {
-		// returns block detail when looking up by hash
-		return new Promise((resolve, reject) => {
-			const blockHashURL = apiUrl + '/api/block/';
-			fetch(blockHashURL + blockHash)
-				.then((response) => response.json())
-				.then((data) => {
-					resolve(data);
-				})
-				.catch((error) => reject(error));
-		});
+	addStateElement(stateKey, item, position = 'back') {
+		const currArray = [...this.state[stateKey]];
+		if (position === 'front') {
+			currArray.unshift(item);
+		} else {
+			currArray.push(item);
+		}
+		this.setState({ [stateKey]: currArray });
 	}
 
 	getAPIElement(endPoint, item) {
 		return new Promise((resolve, reject) => {
-			console.log(endPoint + item);
 			fetch(apiUrl + endPoint + item)
 				.then((response) => response.json())
 				.then((data) => {
@@ -203,90 +131,41 @@ class App extends Component {
 		});
 	}
 
-	addStateElement(stateKey, item, position = 'back', limit) {
-		const currArray = [...this.state.statekey];
-		if (position === 'front') {
-			currArray.unshift(item);
-		} else {
-			currArray.push(item);
-		}
-
-		if (currArray.length > limit) {
-		}
-
-		// this.setState([stateKey])
-	}
+	//////////////////////
+	//
+	// Startup
+	//
+	//////////////////////
 
 	addRandomAssets() {
-		let randomNum;
-		let currentApp = this;
-
-		// while (this.state.randomAssets.length < numRandomAssets) {
-		// 	randomNum = Math.floor(Math.random() * totalAssets) + 1;
-		// 	console.log()
-		// }
-
-		this.getAPIElement(randomAssetURL, randomNum).then((data) =>
-			console.log(data)
-		);
+		let randomAsset = 1000;
+		let app = this;
+		for (let i = 0; i < numRandomAssets; i++) {
+			randomAsset = Math.floor(Math.random() * totalAssets) + 1;
+			this.getAPIElement(randomAssetURL, randomAsset).then((data) =>
+				app.addStateElement('randomAssets', data[0])
+			);
+		}
 	}
 
-	addFiveMostRecentBlocks() {
-		const statusURL = apiUrl + '/api/status';
-		let currentHeight = 0;
-		let currentApp = this;
+	addRecentBlocks() {
+		let latestBlock = 1000;
+		let app = this;
 
-		fetch(statusURL)
-			.then((response) => response.json())
-			.then((data) => {
-				currentHeight = data.info.blocks;
-				this.getBlockByHeight(currentHeight - 4)
-					.then((blockHash) => {
-						this.getBlockByHash(blockHash)
-							.then((blockData) => this.addBlock(blockData))
-							.catch((error) => console.log(error));
-					})
-					.catch((error) => console.log(error));
-				currentApp
-					.getBlockByHeight(currentHeight - 3)
-					.then((blockHash) => {
-						currentApp
-							.getBlockByHash(blockHash)
-							.then((blockData) => currentApp.addBlock(blockData))
-							.catch((error) => console.log(error));
-					})
-					.catch((error) => console.log(error));
-				currentApp
-					.getBlockByHeight(currentHeight - 2)
-					.then((blockHash) => {
-						currentApp
-							.getBlockByHash(blockHash)
-							.then((blockData) => currentApp.addBlock(blockData))
-							.catch((error) => console.log(error));
-					})
-					.catch((error) => console.log(error));
-				currentApp
-					.getBlockByHeight(currentHeight - 1)
-					.then((blockHash) => {
-						currentApp
-							.getBlockByHash(blockHash)
-							.then((blockData) => currentApp.addBlock(blockData))
-							.catch((error) => console.log(error));
-					})
-					.catch((error) => console.log(error));
-				currentApp
-					.getBlockByHeight(currentHeight)
-					.then((blockHash) => {
-						currentApp
-							.getBlockByHash(blockHash)
-							.then((blockData) => currentApp.addBlock(blockData))
-							.catch((error) => console.log(error));
-					})
-					.catch((error) => console.log(error));
-			})
-			.catch((error) => {
-				console.error(error);
-			});
+		const callBlocks = () => {
+			for (let i = 0; i < numBlocks; i++) {
+				app.getAPIElement(blockIndexURL, latestBlock - i).then((data) => {
+					app
+						.getAPIElement(blockHashURL, data.blockHash)
+						.then((data) => app.addStateElement('runningBlocks', data));
+				});
+			}
+		};
+
+		this.getAPIElement(statusURL, '').then((data) => {
+			latestBlock = data.info.blocks;
+			callBlocks();
+		});
 	}
 
 	io() {
@@ -297,41 +176,47 @@ class App extends Component {
 
 	componentDidMount() {
 		// get five last blocks and populate state
-		this.addFiveMostRecentBlocks();
+		this.addRecentBlocks();
 		this.addRandomAssets();
 
-		// // create web socket
-		// const script = document.createElement('script');
-		// script.src = 'https://ravenexplorer.net/socket.io/socket.io.js';
-		// script.async = true;
-		// document.body.appendChild(script);
+		// create web socket
+		const script = document.createElement('script');
+		script.src = 'https://ravenexplorer.net/socket.io/socket.io.js';
+		script.async = true;
+		document.body.appendChild(script);
 
-		// let originalThis = this;
+		let originalThis = this;
 
-		// setTimeout(function () {
-		// 	const room = 'inv';
+		setTimeout(function () {
+			const room = 'inv';
 
-		// 	// react really doesn't like this unless there is a lazy this.io function above
-		// 	const socket = this.io(apiUrl + '/');
+			// react really doesn't like this unless there is a lazy this.io function above
+			const socket = this.io(apiUrl + '/');
 
-		// 	socket.on('connect', function () {
-		// 		// Join the room.
-		// 		socket.emit('subscribe', room);
-		// 	});
-		// 	socket.on('tx', function (txData) {
-		// 		originalThis
-		// 			.getTransaction(txData.txid)
-		// 			.then((txData) => originalThis.addRunningTransaction(txData))
-		// 			.catch((error) => console.log(error));
-		// 	});
-		// 	socket.on('block', function (blockHash) {
-		// 		originalThis
-		// 			.getBlockByHash(blockHash)
-		// 			.then((blockData) => originalThis.addBlock(blockData))
-		// 			.catch((error) => console.log(error));
-		// 	});
-		// }, 500); // delay here so that the socket js file can be loaded from remote
+			socket.on('connect', function () {
+				// Join the room.
+				socket.emit('subscribe', room);
+			});
+			socket.on('tx', function (txData) {
+				originalThis
+					.getAPIElement(txURL, txData.txid)
+					.then((txData) => originalThis.addRunningTransaction(txData))
+					.catch((error) => console.log(error));
+			});
+			socket.on('block', function (blockHash) {
+				originalThis
+					.getAPIElement(blockHashURL, blockHash)
+					.then((blockData) => originalThis.addRunningBlock(blockData))
+					.catch((error) => console.log(error));
+			});
+		}, 500); // delay here so that the socket js file can be loaded from remote
 	}
+
+	//////////////////////
+	//
+	// Search functions
+	//
+	//////////////////////
 
 	handleChange(event) {
 		this.setState({ [event.target.name]: event.target.value }, () => {
@@ -354,7 +239,7 @@ class App extends Component {
 	speculativeSearch() {
 		// search for Block, Transaction, Address, or Asset and build an array of all possible matches
 		if (this.state.search !== '') {
-			this.getBlockByHash(this.state.search)
+			this.getAPIElement(blockHashURL, this.state.search)
 				.then((data) => {
 					if (JSON.stringify(data) !== '["Not found"]') {
 						let newBlockByHash = {
@@ -366,7 +251,7 @@ class App extends Component {
 					}
 				})
 				.catch((error) => console.log(error));
-			this.getTransaction(this.state.search)
+			this.getAPIElement(txURL, this.state.search)
 				.then((data) => {
 					if (JSON.stringify(data) !== '["Not found"]') {
 						let newTx = {
@@ -374,11 +259,11 @@ class App extends Component {
 							blockHeight: data.blockHeight,
 							valueOut: data.valueOut,
 						};
-						this.addSearchMatch('tx', newTx);
+						this.addSearchMatch('transaction', newTx);
 					}
 				})
 				.catch((error) => console.log(error));
-			this.getAddress(this.state.search)
+			this.getAPIElement(addressURL, this.state.search)
 				.then((data) => {
 					if (JSON.stringify(data) !== '["Not found"]') {
 						let newAddr = {
@@ -390,16 +275,28 @@ class App extends Component {
 					}
 				})
 				.catch((error) => console.log(error));
+			this.getAPIElement('/api/assets?asset=', this.state.search + '*')
+				.then((data) => {
+					if (JSON.stringify(data) !== JSON.stringify([])) {
+						for (let i = 0; i < data.length && i < 10; i++) {
+							let newAsset = {
+								hash: data[i],
+							};
+							this.addSearchMatch('asset', newAsset);
+						}
+					}
+				})
+				.catch((error) => console.log(error));
 			if (!isNaN(this.state.search)) {
-				this.getBlockByHeight(this.state.search)
-					.then((blockHash) => {
-						this.getBlockByHash(blockHash)
-							.then((blockHash) => {
-								if (JSON.stringify(blockHash) !== '["Not found"]') {
+				this.getAPIElement(blockIndexURL, this.state.search)
+					.then((data) => {
+						this.getAPIElement(blockHashURL, data.blockHash)
+							.then((data) => {
+								if (JSON.stringify(data) !== '["Not found"]') {
 									let newBlockByHash = {
-										hash: blockHash.hash,
-										blockHeight: blockHash.height,
-										transactions: blockHash.tx.length,
+										hash: data.hash,
+										blockHeight: data.height,
+										transactions: data.tx.length,
 									};
 									this.addSearchMatch('block', newBlockByHash);
 								}
@@ -412,11 +309,10 @@ class App extends Component {
 	}
 
 	searchClicked(props) {
-		if (props.target.dataset.category === 'block') {
-			this.setBlock(props.target.dataset.hash);
-		} else if (props.target.dataset.category === 'tx') {
-			this.setTransaction(props.target.dataset.hash);
-		}
+		this.setStateElement(
+			props.target.dataset.category,
+			props.target.dataset.hash
+		);
 		this.clearSearch();
 	}
 
@@ -433,6 +329,12 @@ class App extends Component {
 			searchMatch: newSearchMatchList,
 		});
 	}
+
+	//////////////////////
+	//
+	// Render, Router, Links
+	//
+	//////////////////////
 
 	render() {
 		return (
@@ -453,6 +355,7 @@ class App extends Component {
 							<Home
 								runningTransactions={this.state.runningTransactions}
 								runningBlocks={this.state.runningBlocks}
+								randomAssets={this.state.randomAssets}
 							/>
 						)}
 					/>
@@ -462,7 +365,7 @@ class App extends Component {
 							return (
 								<Transaction
 									match={routerProps.match}
-									setTransaction={this.setTransaction.bind(this)}
+									setStateElement={this.setStateElement.bind(this)}
 									transaction={this.state.transaction}
 								/>
 							);
@@ -474,8 +377,7 @@ class App extends Component {
 							return (
 								<Block
 									match={routerProps.match}
-									setBlock={this.setBlock.bind(this)}
-									setAddress={this.setAddress.bind(this)}
+									setStateElement={this.setStateElement.bind(this)}
 									block={this.state.block}
 									transactions={this.state.transactions}
 								/>
@@ -488,8 +390,7 @@ class App extends Component {
 							return (
 								<Address
 									match={routerProps.match}
-									setBlock={this.setBlock.bind(this)}
-									setAddress={this.setAddress.bind(this)}
+									setStateElement={this.setStateElement.bind(this)}
 									address={this.state.address}
 									transactions={this.state.transactions}
 								/>
@@ -497,12 +398,12 @@ class App extends Component {
 						}}
 					/>
 					<Route
-						path='/asset/:assetName'
+						path='/asset/:asset'
 						render={(routerProps) => {
 							return (
 								<Asset
 									match={routerProps.match}
-									setAsset={this.setAsset.bind(this)}
+									setStateElement={this.setStateElement.bind(this)}
 									asset={this.state.asset}
 								/>
 							);
