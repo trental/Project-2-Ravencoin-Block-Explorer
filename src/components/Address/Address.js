@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Transaction from '../Transaction/Transaction';
+import Transactions from '../Transactions/Transactions';
 
 class Address extends Component {
 	componentDidMount() {
@@ -7,11 +7,10 @@ class Address extends Component {
 	}
 
 	render() {
-		const txList = this.props.address.transactions.map((tx) => <p>{tx}</p>);
 		return (
 			<div>
 				{this.props.address.addrStr} {this.props.address.balance}
-				{txList}
+				<Transactions transactions={this.props.transactions} />
 			</div>
 		);
 	}

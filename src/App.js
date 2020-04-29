@@ -29,7 +29,7 @@ class App extends Component {
 	}
 
 	addTransactionSet(transactionList) {
-		const workingList = [...this.state.block.tx];
+		const workingList = [...transactionList];
 		const originalThis = this;
 
 		const recursivePullTransaction = (txArray) => {
@@ -96,8 +96,13 @@ class App extends Component {
 	}
 
 	setAddress(address) {
+		let originalThis = this;
 		this.getAddress(address)
-			.then((data) => this.setState({ address: data }))
+			.then((data) =>
+				this.setState({ address: data }, () =>
+					originalThis.addTransactionSet(this.state.address.transactions)
+				)
+			)
 			.catch((error) => console.error(error));
 	}
 
@@ -105,11 +110,8 @@ class App extends Component {
 		let originalThis = this;
 		this.getBlockByHash(blockHash)
 			.then((blockData) => {
-				this.setState(
-					{ block: blockData },
-					() => originalThis.addTransactionSet(this.state.block.tx)
-
-					// () => console.log(this.state.block.tx.length)
+				this.setState({ block: blockData }, () =>
+					originalThis.addTransactionSet(this.state.block.tx)
 				);
 			})
 			.catch((error) => console.error(error));
@@ -404,6 +406,7 @@ class App extends Component {
 									match={routerProps.match}
 									setBlock={this.setBlock.bind(this)}
 									block={this.state.block}
+									transactions={this.state.transactions}
 								/>
 							);
 						}}
@@ -416,6 +419,7 @@ class App extends Component {
 									match={routerProps.match}
 									setAddress={this.setAddress.bind(this)}
 									address={this.state.address}
+									transactions={this.state.transactions}
 								/>
 							);
 						}}

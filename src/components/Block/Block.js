@@ -1,16 +1,19 @@
 import React, { Component } from 'react';
+import Transactions from '../Transactions/Transactions';
 
 class Block extends Component {
 	componentDidMount() {
-		// console.log(this.props.match.params);
 		this.props.setBlock(this.props.match.params.blockHash);
 	}
 
 	render() {
 		return (
-			<div>
-				{this.props.block.hash} {this.props.block.tx.length}
-			</div>
+			<>
+				<div>
+					{this.props.block.hash} {this.props.block.tx.length}
+				</div>
+				<Transactions transactions={this.props.transactions} />
+			</>
 		);
 	}
 }
