@@ -3,7 +3,6 @@ import Transactions from '../Transactions/Transactions';
 
 class Address extends Component {
 	componentDidMount() {
-		// this.props.setAddress(this.props.match.params.address);
 		this.props.setStateElement('address', this.props.match.params.address);
 	}
 

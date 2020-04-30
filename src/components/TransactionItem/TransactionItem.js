@@ -5,10 +5,10 @@ class TransactionItem extends Component {
 	render() {
 		const vinList = this.props.transaction.vin.map((addrIn) => {
 			if (addrIn.coinbase) {
-				return <p>No Inputs, New Coins</p>;
+				return <p key={addrIn.n}>No Inputs, New Coins</p>;
 			} else {
 				return (
-					<p>
+					<p key={addrIn.n}>
 						<Link
 							to={'/addr/' + addrIn.addr}
 							onClick={() =>
@@ -24,7 +24,7 @@ class TransactionItem extends Component {
 		const voutList = this.props.transaction.vout.map((addrOut) => {
 			if (addrOut.scriptPubKey.addresses) {
 				return (
-					<p>
+					<p key={addrOut.n}>
 						<Link
 							to={'/addr/' + addrOut.scriptPubKey.addresses[0]}
 							onClick={() =>
@@ -39,7 +39,7 @@ class TransactionItem extends Component {
 					</p>
 				);
 			} else {
-				return <p>OP RETURN</p>;
+				return <p key={addrOut.n}>OP RETURN</p>;
 			}
 		});
 		return (

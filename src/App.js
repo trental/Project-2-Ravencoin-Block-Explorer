@@ -38,7 +38,7 @@ class App extends Component {
 			block: { tx: [] }, // include arrays for render before data load
 			runningBlocks: [],
 			address: { transactions: [] }, // include arrays for render before data load
-			transactions: [{ vin: [], vout: [] }], // include arrays for render before data load
+			transactions: [{ txid: '', vin: [], vout: [] }], // include arrays for render before data load
 			asset: { temp: {} }, // include object for render before data load
 			randomAssets: [],
 			search: '',
@@ -80,12 +80,22 @@ class App extends Component {
 		this.getAPIElement(url, item)
 			.then((data) => {
 				this.setState({ [stateKey]: data }, () => {
-					if (['block', 'address'].includes(stateKey)) {
+					if (stateKey === 'block') {
 						app.addTransactionSet(this.state.block.tx);
+					} else if (stateKey === 'address') {
+						app.addTransactionSet(this.state.address.transactions);
+					} else if (stateKey === 'transaction') {
+						app.addTransactionSet([this.state.transaction.txid]);
 					}
 				});
 			})
 			.catch((error) => console.error(error));
+	}
+
+	async setBlock(blockHash) {
+		const blockData = await this.fetchBlock(blockHash);
+
+		this.setState({ block: blockData[0], transactions: blockData[1] });
 	}
 
 	addTransactionSet(transactionList) {
@@ -103,6 +113,20 @@ class App extends Component {
 		};
 
 		this.setState({ transactions: [] }, recursivePullTransaction(workingList));
+	}
+
+	async fetchBlock(blockHash, { signal } = {}) {
+		const blockResponse = await fetch(apiUrl + blockHashURL + blockHash, {
+			signal,
+		});
+		const block = await blockResponse.json();
+
+		const transactionFetches = block.tx.map(async (tx) => {
+			const response = await fetch(apiUrl + txURL + tx, { signal });
+			return response.json();
+		});
+
+		return [block, await Promise.all(transactionFetches)];
 	}
 
 	addTransaction(newTransaction) {
@@ -174,11 +198,16 @@ class App extends Component {
 		// loading the websocket stuff
 	}
 
-	componentDidMount() {
+	async componentDidMount() {
 		// get five last blocks and populate state
 		this.addRecentBlocks();
 		this.addRandomAssets();
 
+		const newBlock = await this.fetchBlock(
+			'00000000000019b2fce38df6b6363ac8083bdbd597102b013f7b779f987f724f'
+		);
+
+		console.log(newBlock);
 		// create web socket
 		const script = document.createElement('script');
 		script.src = 'https://ravenexplorer.net/socket.io/socket.io.js';
@@ -259,7 +288,7 @@ class App extends Component {
 							blockHeight: data.blockHeight,
 							valueOut: data.valueOut,
 						};
-						this.addSearchMatch('transaction', newTx);
+						this.addSearchMatch('tx', newTx);
 					}
 				})
 				.catch((error) => console.log(error));
@@ -366,7 +395,7 @@ class App extends Component {
 								<Transaction
 									match={routerProps.match}
 									setStateElement={this.setStateElement.bind(this)}
-									transaction={this.state.transaction}
+									transactions={this.state.transactions}
 								/>
 							);
 						}}
@@ -377,6 +406,7 @@ class App extends Component {
 							return (
 								<Block
 									match={routerProps.match}
+									setBlock={this.setBlock.bind(this)}
 									setStateElement={this.setStateElement.bind(this)}
 									block={this.state.block}
 									transactions={this.state.transactions}

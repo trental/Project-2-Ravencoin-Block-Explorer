@@ -3,7 +3,8 @@ import Transactions from '../Transactions/Transactions';
 
 class Block extends Component {
 	componentDidMount() {
-		this.props.setStateElement('block', this.props.match.params.blockHash);
+		// this.props.setStateElement('block', this.props.match.params.blockHash);
+		this.props.setBlock(this.props.match.params.blockHash);
 	}
 
 	render() {

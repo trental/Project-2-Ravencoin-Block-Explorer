@@ -10,6 +10,7 @@ const RunningBlocks = (props) => {
 			</p>
 		);
 	});
+	list.sort((a, b) => b.key - a.key);
 	return <div>{list}</div>;
 };
 
