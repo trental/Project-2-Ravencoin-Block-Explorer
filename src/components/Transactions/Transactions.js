@@ -9,6 +9,7 @@ class Transactions extends Component {
 					key={tx.txid}
 					transaction={tx}
 					setStateElement={this.props.setStateElement}
+					setAddress={this.props.setAddress}
 				/>
 			);
 		});

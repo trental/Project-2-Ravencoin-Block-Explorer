@@ -2,9 +2,20 @@ import React, { Component } from 'react';
 import Transactions from '../Transactions/Transactions';
 
 class Block extends Component {
+	constructor(props) {
+		super(props);
+
+		this.controller = new AbortController();
+		this.signal = this.controller.signal;
+	}
+
 	componentDidMount() {
-		// this.props.setStateElement('block', this.props.match.params.blockHash);
-		this.props.setBlock(this.props.match.params.blockHash);
+		const signal = this.signal;
+		this.props.setBlock(this.props.match.params.blockHash, { signal });
+	}
+
+	componentWillUnmount() {
+		this.controller.abort();
 	}
 
 	render() {
@@ -16,7 +27,11 @@ class Block extends Component {
 				<Transactions
 					transactions={this.props.transactions}
 					setStateElement={this.props.setStateElement}
+					setAddress={this.props.setAddress}
 				/>
+				<button onClick={() => this.props.setMoreBlockTransactions()}>
+					Click Me
+				</button>
 			</>
 		);
 	}

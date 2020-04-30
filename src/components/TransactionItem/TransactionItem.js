@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 
 class TransactionItem extends Component {
 	render() {
-		const vinList = this.props.transaction.vin.map((addrIn) => {
+		const vinShortList = this.props.transaction.vin.slice(0, 10);
+		const vinList = vinShortList.map((addrIn) => {
 			if (addrIn.coinbase) {
 				return <p key={addrIn.n}>No Inputs, New Coins</p>;
 			} else {
@@ -11,9 +12,7 @@ class TransactionItem extends Component {
 					<p key={addrIn.n}>
 						<Link
 							to={'/addr/' + addrIn.addr}
-							onClick={() =>
-								this.props.setStateElement('address', addrIn.addr)
-							}>
+							onClick={() => this.props.setAddress(addrIn.addr)}>
 							{addrIn.addr}
 						</Link>{' '}
 						{addrIn.value}
@@ -21,17 +20,15 @@ class TransactionItem extends Component {
 				);
 			}
 		});
-		const voutList = this.props.transaction.vout.map((addrOut) => {
+		const voutShortList = this.props.transaction.vout.slice(0, 10);
+		const voutList = voutShortList.map((addrOut) => {
 			if (addrOut.scriptPubKey.addresses) {
 				return (
 					<p key={addrOut.n}>
 						<Link
 							to={'/addr/' + addrOut.scriptPubKey.addresses[0]}
 							onClick={() =>
-								this.props.setStateElement(
-									'address',
-									addrOut.scriptPubKey.addresses[0]
-								)
+								this.props.setAddress(addrOut.scriptPubKey.addresses[0])
 							}>
 							{addrOut.scriptPubKey.addresses[0]}
 						</Link>{' '}

@@ -83,6 +83,7 @@ class App extends Component {
 					if (stateKey === 'block') {
 						app.addTransactionSet(this.state.block.tx);
 					} else if (stateKey === 'address') {
+						console.log('wth');
 						app.addTransactionSet(this.state.address.transactions);
 					} else if (stateKey === 'transaction') {
 						app.addTransactionSet([this.state.transaction.txid]);
@@ -90,12 +91,6 @@ class App extends Component {
 				});
 			})
 			.catch((error) => console.error(error));
-	}
-
-	async setBlock(blockHash) {
-		const blockData = await this.fetchBlock(blockHash);
-
-		this.setState({ block: blockData[0], transactions: blockData[1] });
 	}
 
 	addTransactionSet(transactionList) {
@@ -118,15 +113,81 @@ class App extends Component {
 	async fetchBlock(blockHash, { signal } = {}) {
 		const blockResponse = await fetch(apiUrl + blockHashURL + blockHash, {
 			signal,
-		});
+		}).catch((error) => console.error('wow an error!', error));
 		const block = await blockResponse.json();
+		const firstTransactions = block.tx.slice(0, 10);
 
-		const transactionFetches = block.tx.map(async (tx) => {
-			const response = await fetch(apiUrl + txURL + tx, { signal });
+		const transactionFetches = firstTransactions.map(async (tx) => {
+			const response = await fetch(apiUrl + txURL + tx, {
+				signal,
+			}).catch((error) => console.error('wow an error!', error));
 			return response.json();
 		});
 
 		return [block, await Promise.all(transactionFetches)];
+	}
+
+	async setBlock(blockHash, { signal } = {}) {
+		const blockData = await this.fetchBlock(blockHash, { signal });
+
+		this.setState({ block: blockData[0], transactions: blockData[1] });
+	}
+
+	loadMoreBlockTransactions() {
+		const block = this.state.block;
+		const currTransactions = this.state.transactions.length;
+		const nextTransactions = block.tx.slice(
+			currTransactions,
+			currTransactions + 10
+		);
+
+		const transactionFetches = nextTransactions.map(async (tx) => {
+			const response = await fetch(apiUrl + txURL + tx).catch((error) =>
+				console.error('wow an error!', error)
+			);
+			return response.json();
+		});
+
+		return Promise.all(transactionFetches);
+	}
+
+	async setMoreBlockTransactions() {
+		const transactionData = await this.loadMoreBlockTransactions();
+
+		console.log(transactionData);
+
+		const newTransactions = [...this.state.transactions].concat(
+			transactionData
+		);
+
+		this.setState({
+			transactions: newTransactions,
+		});
+	}
+
+	async fetchAddress(addressHash, { signal } = {}) {
+		const addressResponse = await fetch(apiUrl + addressURL + addressHash, {
+			signal,
+		}).catch((error) => console.error('wow an error!', error));
+		const address = await addressResponse.json();
+		const firstTransactions = address.transactions.slice(0, 10);
+
+		const transactionFetches = firstTransactions.map(async (tx) => {
+			const response = await fetch(apiUrl + txURL + tx, {
+				signal,
+			}).catch((error) => console.error('wow an error!', error));
+			return response.json();
+		});
+
+		return [address, await Promise.all(transactionFetches)];
+	}
+
+	async setAddress(addressHash, { signal } = {}) {
+		const addressData = await this.fetchAddress(addressHash, {
+			signal,
+		});
+
+		this.setState({ address: addressData[0], transactions: addressData[1] });
 	}
 
 	addTransaction(newTransaction) {
@@ -203,11 +264,6 @@ class App extends Component {
 		this.addRecentBlocks();
 		this.addRandomAssets();
 
-		const newBlock = await this.fetchBlock(
-			'00000000000019b2fce38df6b6363ac8083bdbd597102b013f7b779f987f724f'
-		);
-
-		console.log(newBlock);
 		// create web socket
 		const script = document.createElement('script');
 		script.src = 'https://ravenexplorer.net/socket.io/socket.io.js';
@@ -407,9 +463,13 @@ class App extends Component {
 								<Block
 									match={routerProps.match}
 									setBlock={this.setBlock.bind(this)}
+									setAddress={this.setAddress.bind(this)}
 									setStateElement={this.setStateElement.bind(this)}
 									block={this.state.block}
 									transactions={this.state.transactions}
+									setMoreBlockTransactions={this.setMoreBlockTransactions.bind(
+										this
+									)}
 								/>
 							);
 						}}
@@ -420,6 +480,7 @@ class App extends Component {
 							return (
 								<Address
 									match={routerProps.match}
+									setAddress={this.setAddress.bind(this)}
 									setStateElement={this.setStateElement.bind(this)}
 									address={this.state.address}
 									transactions={this.state.transactions}
