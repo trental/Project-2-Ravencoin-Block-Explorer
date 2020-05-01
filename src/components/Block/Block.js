@@ -9,7 +9,8 @@ class Block extends Component {
 		this.signal = this.controller.signal;
 	}
 
-	componentDidMount() {
+	async componentDidMount() {
+		await this.props.clearBlock();
 		const signal = this.signal;
 		this.props.setBlock(this.props.match.params.blockHash, { signal });
 	}

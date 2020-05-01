@@ -11,6 +11,7 @@ import Asset from './components/Asset/Asset';
 const numTransactions = 10;
 const numBlocks = 10;
 const numRandomAssets = 10;
+const loadPerTime = 25;
 const apiUrl = 'https://ravenexplorer.net';
 const totalAssets = 23463;
 const randomAssetURL = '/api/assets?asset=*&size=1&skip=';
@@ -26,6 +27,9 @@ const stateKeyURL = {
 	block: blockHashURL,
 	transaction: txURL,
 };
+const emptyBlock = { tx: [] };
+const emptyTransactions = [{ txid: '', vin: [], vout: [] }];
+const emptyAddress = { transactions: [] };
 
 // const apiUrl = 'http://192.168.1.21:3100';
 class App extends Component {
@@ -33,13 +37,13 @@ class App extends Component {
 		super(props);
 
 		this.state = {
-			transaction: { vin: [], vout: [] }, // include arrays for render before data load
+			transaction: { vin: [], vout: [] },
 			runningTransactions: [],
-			block: { tx: [] }, // include arrays for render before data load
+			block: emptyBlock,
 			runningBlocks: [],
-			address: { transactions: [] }, // include arrays for render before data load
-			transactions: [{ txid: '', vin: [], vout: [] }], // include arrays for render before data load
-			asset: { temp: {} }, // include object for render before data load
+			address: emptyAddress,
+			transactions: emptyTransactions,
+			asset: { temp: {} },
 			randomAssets: [],
 			search: '',
 			searchMatch: [],
@@ -133,18 +137,22 @@ class App extends Component {
 		this.setState({ block: blockData[0], transactions: blockData[1] });
 	}
 
+	clearBlock() {
+		this.setState({ block: emptyBlock, transactions: emptyTransactions });
+	}
+
 	loadMoreBlockTransactions() {
 		const block = this.state.block;
 		const currTransactions = this.state.transactions.length;
 		const nextTransactions = block.tx.slice(
 			currTransactions,
-			currTransactions + 10
+			currTransactions + loadPerTime
 		);
 
 		const transactionFetches = nextTransactions.map(async (tx) => {
-			const response = await fetch(apiUrl + txURL + tx).catch((error) =>
-				console.error('wow an error!', error)
-			);
+			const response = await fetch(apiUrl + txURL + tx).catch((error) => {
+				console.error('wow an error!', error);
+			});
 			return response.json();
 		});
 
@@ -190,6 +198,10 @@ class App extends Component {
 		this.setState({ address: addressData[0], transactions: addressData[1] });
 	}
 
+	clearAddress() {
+		this.setState({ address: emptyAddress });
+	}
+
 	addTransaction(newTransaction) {
 		const newTransactionsList = [newTransaction, ...this.state.transactions];
 		this.setState({ transactions: newTransactionsList });
@@ -223,7 +235,7 @@ class App extends Component {
 	//////////////////////
 
 	addRandomAssets() {
-		let randomAsset = 1000;
+		let randomAsset;
 		let app = this;
 		for (let i = 0; i < numRandomAssets; i++) {
 			randomAsset = Math.floor(Math.random() * totalAssets) + 1;
@@ -234,7 +246,7 @@ class App extends Component {
 	}
 
 	addRecentBlocks() {
-		let latestBlock = 1000;
+		let latestBlock;
 		let app = this;
 
 		const callBlocks = () => {
@@ -452,6 +464,7 @@ class App extends Component {
 									match={routerProps.match}
 									setStateElement={this.setStateElement.bind(this)}
 									transactions={this.state.transactions}
+									setAddress={this.setAddress.bind(this)}
 								/>
 							);
 						}}
@@ -470,6 +483,8 @@ class App extends Component {
 									setMoreBlockTransactions={this.setMoreBlockTransactions.bind(
 										this
 									)}
+									onScroll={this.handleScroll}
+									clearBlock={this.clearBlock.bind(this)}
 								/>
 							);
 						}}
@@ -484,6 +499,7 @@ class App extends Component {
 									setStateElement={this.setStateElement.bind(this)}
 									address={this.state.address}
 									transactions={this.state.transactions}
+									clearAddress={this.clearAddress.bind(this)}
 								/>
 							);
 						}}

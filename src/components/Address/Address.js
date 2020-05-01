@@ -9,7 +9,8 @@ class Address extends Component {
 		this.signal = this.controller.signal;
 	}
 
-	componentDidMount() {
+	async componentDidMount() {
+		await this.props.clearAddress();
 		const signal = this.signal;
 		this.props.setAddress(this.props.match.params.address, { signal });
 	}
