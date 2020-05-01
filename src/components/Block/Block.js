@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Transactions from '../Transactions/Transactions';
+import Button from 'react-bootstrap/Button';
 
 class Block extends Component {
 	constructor(props) {
@@ -30,9 +31,11 @@ class Block extends Component {
 					setStateElement={this.props.setStateElement}
 					setAddress={this.props.setAddress}
 				/>
-				<button onClick={() => this.props.setMoreBlockTransactions()}>
-					Click Me
-				</button>
+				<Button
+					variant='primary'
+					onClick={() => this.props.setMoreBlockTransactions()}>
+					Load More Transactions
+				</Button>
 			</>
 		);
 	}

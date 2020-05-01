@@ -3,8 +3,7 @@ import { Link } from 'react-router-dom';
 
 class TransactionItem extends Component {
 	render() {
-		const vinShortList = this.props.transaction.vin.slice(0, 10);
-		const vinList = vinShortList.map((addrIn) => {
+		const vinList = this.props.transaction.vin.map((addrIn) => {
 			if (addrIn.coinbase) {
 				return <p key={addrIn.n}>No Inputs, New Coins</p>;
 			} else {
@@ -20,8 +19,7 @@ class TransactionItem extends Component {
 				);
 			}
 		});
-		const voutShortList = this.props.transaction.vout.slice(0, 10);
-		const voutList = voutShortList.map((addrOut) => {
+		const voutList = this.props.transaction.vout.map((addrOut) => {
 			if (addrOut.scriptPubKey.addresses) {
 				return (
 					<p key={addrOut.n}>

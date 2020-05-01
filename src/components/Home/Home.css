@@ -1,0 +1,42 @@
+.homeSection {
+	display: block;
+	border: 2px;
+	padding: 10px;
+	margin: 3px;
+	background: #eeeeee;
+	height: 350px;
+}
+
+.dataRow {
+	margin: 2px;
+	padding: 2px;
+	background: #cccccc;
+}
+
+.dataRow:hover {
+	background: #ccccee;
+}
+
+.headerRow {
+	margin: 2px;
+	padding: 5px;
+	background: #aaaaaa;
+}
+
+.blockItem {
+	display: inline-block;
+	width: 33%;
+	text-align: center;
+}
+
+.transactionItem {
+	display: inline-block;
+	width: 50%;
+	text-align: center;
+}
+
+.assetItem {
+	display: inline-block;
+	width: 33%;
+	text-align: center;
+}

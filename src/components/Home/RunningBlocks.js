@@ -4,14 +4,26 @@ import { Link } from 'react-router-dom';
 const RunningBlocks = (props) => {
 	const list = props.runningBlocks.map((block) => {
 		return (
-			<p key={block.height}>
-				<Link to={'/block/' + block.hash}>{block.height}</Link>{' '}
-				{block.tx.length}
-			</p>
+			<div key={block.height} className='dataRow'>
+				<div className='blockItem'>
+					<Link to={'/block/' + block.hash}>{block.height}</Link>
+				</div>
+				<div className='blockItem'>{block.tx.length}</div>
+				<div className='blockItem'>{block.size}</div>
+			</div>
 		);
 	});
 	list.sort((a, b) => b.key - a.key);
-	return <div>{list}</div>;
+	return (
+		<>
+			<div className='headerRow'>
+				<div className='blockItem'>Latest Blocks by Height</div>
+				<div className='blockItem'>Transactions</div>
+				<div className='blockItem'>Size</div>
+			</div>
+			<div>{list}</div>
+		</>
+	);
 };
 
 export default RunningBlocks;

@@ -1,0 +1,15 @@
+input {
+	width: 500px;
+}
+
+.search-overlay {
+	position: fixed;
+	z-index: 99999;
+	margin-top: 43px;
+	margin-right: 16px;
+	width: 500px;
+	background-color: #dddddd;
+	top: 0;
+	right: 0;
+	position: fixed;
+}

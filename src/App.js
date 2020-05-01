@@ -7,6 +7,7 @@ import Block from './components/Block/Block';
 import Header from './components/Header/Header';
 import Address from './components/Address/Address';
 import Asset from './components/Asset/Asset';
+import Layout from './components/Layout';
 
 const numTransactions = 10;
 const numBlocks = 10;
@@ -30,6 +31,18 @@ const stateKeyURL = {
 const emptyBlock = { tx: [] };
 const emptyTransactions = [{ txid: '', vin: [], vout: [] }];
 const emptyAddress = { transactions: [] };
+const emptyRunningTransactions = [
+	{ txid: 'a' },
+	{ txid: 'b' },
+	{ txid: 'c' },
+	{ txid: 'd' },
+	{ txid: 'e' },
+	{ txid: 'f' },
+	{ txid: 'g' },
+	{ txid: 'h' },
+	{ txid: 'i' },
+	{ txid: 'j' },
+];
 
 // const apiUrl = 'http://192.168.1.21:3100';
 class App extends Component {
@@ -38,7 +51,7 @@ class App extends Component {
 
 		this.state = {
 			transaction: { vin: [], vout: [] },
-			runningTransactions: [],
+			runningTransactions: emptyRunningTransactions,
 			block: emptyBlock,
 			runningBlocks: [],
 			address: emptyAddress,
@@ -267,9 +280,17 @@ class App extends Component {
 		let app = this;
 		for (let i = 0; i < numRandomAssets; i++) {
 			randomAsset = Math.floor(Math.random() * totalAssets) + 1;
-			this.getAPIElement(randomAssetURL, randomAsset).then((data) =>
-				app.addStateElement('randomAssets', data[0])
-			);
+			this.getAPIElement(randomAssetURL, randomAsset).then((assetName) => {
+				this.getAPIElement(assetURL, assetName[0]).then((data) => {
+					const assetData = data[assetName[0]];
+					app.addStateElement('randomAssets', {
+						name: assetData.name,
+						amount: assetData.amount,
+						block: assetData.block_height,
+					});
+					// console.log(assetData);
+				});
+			});
 		}
 	}
 
@@ -300,9 +321,9 @@ class App extends Component {
 	}
 
 	async componentDidMount() {
-		// get five last blocks and populate state
-		this.addRecentBlocks();
+		// get recent blocks, random assets
 		this.addRandomAssets();
+		this.addRecentBlocks();
 
 		// create web socket
 		const script = document.createElement('script');
@@ -463,92 +484,96 @@ class App extends Component {
 
 	render() {
 		return (
-			<div>
-				<nav>
-					<Header
-						handleChange={this.handleChange.bind(this)}
-						searchMatch={this.state.searchMatch}
-						searchClicked={this.searchClicked.bind(this)}
-						search={this.state.search}
-					/>
-				</nav>
-				<main>
-					<Route
-						path='/'
-						exact
-						render={(routerProps) => (
-							<Home
-								runningTransactions={this.state.runningTransactions}
-								runningBlocks={this.state.runningBlocks}
-								randomAssets={this.state.randomAssets}
+			<React.Fragment>
+				<Layout>
+					<div>
+						<nav>
+							<Header
+								handleChange={this.handleChange.bind(this)}
+								searchMatch={this.state.searchMatch}
+								searchClicked={this.searchClicked.bind(this)}
+								search={this.state.search}
 							/>
-						)}
-					/>
-					<Route
-						path='/tx/:txHash'
-						render={(routerProps) => {
-							return (
-								<Transaction
-									match={routerProps.match}
-									setStateElement={this.setStateElement.bind(this)}
-									transactions={this.state.transactions}
-									setAddress={this.setAddress.bind(this)}
-								/>
-							);
-						}}
-					/>
-					<Route
-						path='/block/:blockHash'
-						render={(routerProps) => {
-							return (
-								<Block
-									match={routerProps.match}
-									setBlock={this.setBlock.bind(this)}
-									setAddress={this.setAddress.bind(this)}
-									setStateElement={this.setStateElement.bind(this)}
-									block={this.state.block}
-									transactions={this.state.transactions}
-									setMoreBlockTransactions={this.setMoreBlockTransactions.bind(
-										this
-									)}
-									onScroll={this.handleScroll}
-									clearBlock={this.clearBlock.bind(this)}
-								/>
-							);
-						}}
-					/>
-					<Route
-						path='/addr/:address'
-						render={(routerProps) => {
-							return (
-								<Address
-									match={routerProps.match}
-									setAddress={this.setAddress.bind(this)}
-									setStateElement={this.setStateElement.bind(this)}
-									address={this.state.address}
-									transactions={this.state.transactions}
-									clearAddress={this.clearAddress.bind(this)}
-									setMoreAddressTransactions={this.setMoreAddressTransactions.bind(
-										this
-									)}
-								/>
-							);
-						}}
-					/>
-					<Route
-						path='/asset/:asset'
-						render={(routerProps) => {
-							return (
-								<Asset
-									match={routerProps.match}
-									setStateElement={this.setStateElement.bind(this)}
-									asset={this.state.asset}
-								/>
-							);
-						}}
-					/>
-				</main>
-			</div>
+						</nav>
+						<main>
+							<Route
+								path='/'
+								exact
+								render={(routerProps) => (
+									<Home
+										runningTransactions={this.state.runningTransactions}
+										runningBlocks={this.state.runningBlocks}
+										randomAssets={this.state.randomAssets}
+									/>
+								)}
+							/>
+							<Route
+								path='/tx/:txHash'
+								render={(routerProps) => {
+									return (
+										<Transaction
+											match={routerProps.match}
+											setStateElement={this.setStateElement.bind(this)}
+											transactions={this.state.transactions}
+											setAddress={this.setAddress.bind(this)}
+										/>
+									);
+								}}
+							/>
+							<Route
+								path='/block/:blockHash'
+								render={(routerProps) => {
+									return (
+										<Block
+											match={routerProps.match}
+											setBlock={this.setBlock.bind(this)}
+											setAddress={this.setAddress.bind(this)}
+											setStateElement={this.setStateElement.bind(this)}
+											block={this.state.block}
+											transactions={this.state.transactions}
+											setMoreBlockTransactions={this.setMoreBlockTransactions.bind(
+												this
+											)}
+											onScroll={this.handleScroll}
+											clearBlock={this.clearBlock.bind(this)}
+										/>
+									);
+								}}
+							/>
+							<Route
+								path='/addr/:address'
+								render={(routerProps) => {
+									return (
+										<Address
+											match={routerProps.match}
+											setAddress={this.setAddress.bind(this)}
+											setStateElement={this.setStateElement.bind(this)}
+											address={this.state.address}
+											transactions={this.state.transactions}
+											clearAddress={this.clearAddress.bind(this)}
+											setMoreAddressTransactions={this.setMoreAddressTransactions.bind(
+												this
+											)}
+										/>
+									);
+								}}
+							/>
+							<Route
+								path='/asset/:asset'
+								render={(routerProps) => {
+									return (
+										<Asset
+											match={routerProps.match}
+											setStateElement={this.setStateElement.bind(this)}
+											asset={this.state.asset}
+										/>
+									);
+								}}
+							/>
+						</main>
+					</div>
+				</Layout>
+			</React.Fragment>
 		);
 	}
 }

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import Transactions from '../Transactions/Transactions';
-import { Link } from 'react-router-dom';
 
 class Transaction extends Component {
 	componentDidMount() {

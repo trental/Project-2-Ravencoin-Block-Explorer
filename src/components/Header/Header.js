@@ -1,5 +1,24 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Nav, Navbar } from 'react-bootstrap';
+import styled from 'styled-components';
+import './Header.css';
+
+const Styles = styled.div`
+	.navbar {
+		background-color: #222;
+	}
+
+	.navbar-brand,
+	.navbar-nav,
+	.nav-link {
+		color: #bbb;
+
+		&:hover {
+			color: white;
+		}
+	}
+`;
 
 const Header = (props) => {
 	const list = props.searchMatch.map((item) => {
@@ -24,15 +43,22 @@ const Header = (props) => {
 		);
 	});
 	return (
-		<>
-			<Link to='/'>Home</Link>
-			<input
-				placeholder='Search'
-				onChange={props.handleChange.bind(this)}
-				name='search'
-				value={props.search}></input>
-			<div>{list}</div>
-		</>
+		<Styles>
+			<Navbar expand='lg' fixed='top'>
+				<Navbar.Brand>
+					<Link to='/'>Ravencoin Explorer</Link>
+				</Navbar.Brand>
+				<Nav className='ml-auto'>
+					<input
+						autoComplete='off'
+						placeholder='Search for Block, Address, Transaction, or Asset'
+						onChange={props.handleChange.bind(this)}
+						name='search'
+						value={props.search}></input>
+					<div className='search-overlay'>{list}</div>
+				</Nav>
+			</Navbar>
+		</Styles>
 	);
 };
 
