@@ -21,14 +21,21 @@ class Address extends Component {
 
 	render() {
 		return (
-			<div>
-				{this.props.address.addrStr} {this.props.address.balance}
-				<Transactions
-					transactions={this.props.transactions}
-					setStateElement={this.props.setStateElement}
-					setAddress={this.props.setAddress}
-				/>
-			</div>
+			<>
+				<div>
+					{this.props.address.addrStr} {this.props.address.balance}
+				</div>
+				<div>
+					<Transactions
+						transactions={this.props.transactions}
+						setStateElement={this.props.setStateElement}
+						setAddress={this.props.setAddress}
+					/>
+				</div>
+				<button onClick={() => this.props.setMoreAddressTransactions()}>
+					Click Me
+				</button>
+			</>
 		);
 	}
 }

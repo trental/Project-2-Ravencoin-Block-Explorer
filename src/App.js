@@ -162,8 +162,6 @@ class App extends Component {
 	async setMoreBlockTransactions() {
 		const transactionData = await this.loadMoreBlockTransactions();
 
-		console.log(transactionData);
-
 		const newTransactions = [...this.state.transactions].concat(
 			transactionData
 		);
@@ -200,6 +198,36 @@ class App extends Component {
 
 	clearAddress() {
 		this.setState({ address: emptyAddress });
+	}
+
+	loadMoreAddressTransactions() {
+		const address = this.state.address;
+		const currTransactions = this.state.transactions.length;
+		const nextTransactions = address.transactions.slice(
+			currTransactions,
+			currTransactions + loadPerTime
+		);
+
+		const transactionFetches = nextTransactions.map(async (tx) => {
+			const response = await fetch(apiUrl + txURL + tx).catch((error) => {
+				console.error('wow an error!', error);
+			});
+			return response.json();
+		});
+
+		return Promise.all(transactionFetches);
+	}
+
+	async setMoreAddressTransactions() {
+		const transactionData = await this.loadMoreAddressTransactions();
+
+		const newTransactions = [...this.state.transactions].concat(
+			transactionData
+		);
+
+		this.setState({
+			transactions: newTransactions,
+		});
 	}
 
 	addTransaction(newTransaction) {
@@ -500,6 +528,9 @@ class App extends Component {
 									address={this.state.address}
 									transactions={this.state.transactions}
 									clearAddress={this.clearAddress.bind(this)}
+									setMoreAddressTransactions={this.setMoreAddressTransactions.bind(
+										this
+									)}
 								/>
 							);
 						}}
