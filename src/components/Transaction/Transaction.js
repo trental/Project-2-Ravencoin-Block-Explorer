@@ -3,7 +3,8 @@ import Transactions from '../Transactions/Transactions';
 
 class Transaction extends Component {
 	componentDidMount() {
-		this.props.setStateElement('transaction', this.props.match.params.txHash);
+		// this.props.setStateElement('transaction', this.props.match.params.txHash);
+		this.props.setTransaction(this.props.match.params.txHash);
 	}
 
 	render() {

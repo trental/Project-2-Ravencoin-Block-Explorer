@@ -128,6 +128,12 @@ class App extends Component {
 		this.setState({ block: blockData[0], transactions: blockData[1] });
 	}
 
+	async setTransaction(transactionHash, { signal } = {}) {
+		const transactionData = await this.getAPIElement(txURL, transactionHash);
+
+		this.setState({ transactions: [transactionData] });
+	}
+
 	clearBlock() {
 		this.setState({ block: emptyBlock, transactions: emptyTransactions });
 	}
@@ -255,7 +261,6 @@ class App extends Component {
 				}
 			}
 
-			console.log(outputString);
 			return outputString;
 		};
 
@@ -294,7 +299,6 @@ class App extends Component {
 				}
 			}
 
-			console.log(outputString);
 			return outputString;
 		};
 
@@ -303,12 +307,7 @@ class App extends Component {
 		for (let i = 0; i < numRandomAssets; i++) {
 			randomAsset = Math.floor(Math.random() * totalAssets) + 1;
 			this.getAPIElement(randomAssetURL, randomAsset).then((assetName) => {
-				console.log(assetName[0]);
-				// convertToUrl(assetName[0]);
-				// console.log(assetURL + assetName[0]);
-				// console.log(assetURL + convertToUrl(assetName[0]));
 				this.getAPIElement(assetURL, assetName[0]).then((data) => {
-					console.log(data);
 					const assetData = data[assetName[0]];
 					app.addStateElement('randomAssets', {
 						name: assetData.name,
@@ -482,10 +481,20 @@ class App extends Component {
 	}
 
 	searchClicked(props) {
-		this.setStateElement(
-			props.target.dataset.category,
-			props.target.dataset.hash
-		);
+		if (props.target.dataset.category === 'addr') {
+			this.setAddress(props.target.dataset.hash);
+		} else if (props.target.dataset.category === 'block') {
+			this.setBlock(props.target.dataset.hash);
+		} else if (props.target.dataset.category === 'tx') {
+			this.setTransaction(props.target.dataset.hash);
+		} else if (props.target.dataset.category === 'asset') {
+			this.setStateElement('asset', props.target.dataset.hash);
+		}
+
+		// this.setStateElement(
+		// 	props.target.dataset.category,
+		// 	props.target.dataset.hash
+		// );
 		this.clearSearch();
 	}
 
@@ -543,6 +552,7 @@ class App extends Component {
 											setStateElement={this.setStateElement.bind(this)}
 											transactions={this.state.transactions}
 											setAddress={this.setAddress.bind(this)}
+											setTransaction={this.setTransaction.bind(this)}
 										/>
 									);
 								}}
