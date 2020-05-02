@@ -43,6 +43,10 @@ const emptyRunningTransactions = [
 	{ txid: 'i' },
 	{ txid: 'j' },
 ];
+const apiSpecialCharacter = ['#'];
+const apiSpecialMap = ['%23'];
+const urlSpecialCharacter = ['/', '#'];
+const urlSpecialMap = ['%2F', '%23'];
 
 // const apiUrl = 'http://192.168.1.21:3100';
 class App extends Component {
@@ -96,35 +100,9 @@ class App extends Component {
 
 		this.getAPIElement(url, item)
 			.then((data) => {
-				this.setState({ [stateKey]: data }, () => {
-					if (stateKey === 'block') {
-						app.addTransactionSet(this.state.block.tx);
-					} else if (stateKey === 'address') {
-						console.log('wth');
-						app.addTransactionSet(this.state.address.transactions);
-					} else if (stateKey === 'transaction') {
-						app.addTransactionSet([this.state.transaction.txid]);
-					}
-				});
+				this.setState({ [stateKey]: data });
 			})
 			.catch((error) => console.error(error));
-	}
-
-	addTransactionSet(transactionList) {
-		const workingList = [...transactionList];
-		const originalThis = this;
-
-		const recursivePullTransaction = (txArray) => {
-			if (txArray.length > 0) {
-				let singleTx = txArray.pop();
-				recursivePullTransaction(txArray);
-				originalThis
-					.getAPIElement(txURL, singleTx)
-					.then((tx) => originalThis.addTransaction(tx));
-			}
-		};
-
-		this.setState({ transactions: [] }, recursivePullTransaction(workingList));
 	}
 
 	async fetchBlock(blockHash, { signal } = {}) {
@@ -259,8 +237,30 @@ class App extends Component {
 	}
 
 	getAPIElement(endPoint, item) {
+		let itemString = item.toString();
+
+		const replaceAt = (string, index, replace) => {
+			return string.substring(0, index) + replace + string.substring(index + 1);
+		};
+
+		const convertToApi = (inputString) => {
+			let position;
+			let outputString = inputString.slice();
+
+			for (let i = 0; i < apiSpecialCharacter.length; i++) {
+				position = outputString.indexOf(apiSpecialCharacter[i]);
+				while (position > 0) {
+					outputString = replaceAt(outputString, position, apiSpecialMap[i]);
+					position = outputString.indexOf(apiSpecialCharacter[i]);
+				}
+			}
+
+			console.log(outputString);
+			return outputString;
+		};
+
 		return new Promise((resolve, reject) => {
-			fetch(apiUrl + endPoint + item)
+			fetch(apiUrl + endPoint + convertToApi(itemString))
 				.then((response) => response.json())
 				.then((data) => {
 					resolve(data);
@@ -275,20 +275,47 @@ class App extends Component {
 	//
 	//////////////////////
 
-	addRandomAssets() {
+	async addRandomAssets() {
 		let randomAsset;
+
+		const replaceAt = (string, index, replace) => {
+			return string.substring(0, index) + replace + string.substring(index + 1);
+		};
+
+		const convertToUrl = (inputString) => {
+			let position;
+			let outputString = inputString.slice();
+
+			for (let i = 0; i < urlSpecialCharacter.length; i++) {
+				position = outputString.indexOf(urlSpecialCharacter[i]);
+				while (position > 0) {
+					outputString = replaceAt(outputString, position, urlSpecialMap[i]);
+					position = outputString.indexOf(urlSpecialCharacter[i]);
+				}
+			}
+
+			console.log(outputString);
+			return outputString;
+		};
+
 		let app = this;
+
 		for (let i = 0; i < numRandomAssets; i++) {
 			randomAsset = Math.floor(Math.random() * totalAssets) + 1;
 			this.getAPIElement(randomAssetURL, randomAsset).then((assetName) => {
+				console.log(assetName[0]);
+				// convertToUrl(assetName[0]);
+				// console.log(assetURL + assetName[0]);
+				// console.log(assetURL + convertToUrl(assetName[0]));
 				this.getAPIElement(assetURL, assetName[0]).then((data) => {
+					console.log(data);
 					const assetData = data[assetName[0]];
 					app.addStateElement('randomAssets', {
 						name: assetData.name,
+						link: convertToUrl(assetData.name),
 						amount: assetData.amount,
 						block: assetData.block_height,
 					});
-					// console.log(assetData);
 				});
 			});
 		}
