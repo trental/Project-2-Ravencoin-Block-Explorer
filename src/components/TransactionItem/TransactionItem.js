@@ -1,28 +1,29 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import './TransactionItem.css';
 
 class TransactionItem extends Component {
 	render() {
 		const vinList = this.props.transaction.vin.map((addrIn) => {
 			if (addrIn.coinbase) {
-				return <p key={addrIn.n}>No Inputs, New Coins</p>;
+				return <div key={addrIn.n}>No Inputs, New Coins</div>;
 			} else {
 				return (
-					<p key={addrIn.n}>
+					<div key={addrIn.n}>
 						<Link
 							to={'/addr/' + addrIn.addr}
 							onClick={() => this.props.setAddress(addrIn.addr)}>
 							{addrIn.addr}
 						</Link>{' '}
-						{addrIn.value}
-					</p>
+						<span>{addrIn.value}</span>
+					</div>
 				);
 			}
 		});
 		const voutList = this.props.transaction.vout.map((addrOut) => {
 			if (addrOut.scriptPubKey.addresses) {
 				return (
-					<p key={addrOut.n}>
+					<div key={addrOut.n}>
 						<Link
 							to={'/addr/' + addrOut.scriptPubKey.addresses[0]}
 							onClick={() =>
@@ -31,10 +32,10 @@ class TransactionItem extends Component {
 							{addrOut.scriptPubKey.addresses[0]}
 						</Link>{' '}
 						{addrOut.value}
-					</p>
+					</div>
 				);
 			} else {
-				return <p key={addrOut.n}>OP RETURN</p>;
+				return <div key={addrOut.n}>OP RETURN</div>;
 			}
 		});
 		return (
@@ -47,8 +48,8 @@ class TransactionItem extends Component {
 						</Link>
 					</p>
 				</div>
-				<div>Inputs: {vinList}</div>
-				<div>Outputs: {voutList}</div>
+				<div className='addressSection'>Inputs: {vinList}</div>
+				<div className='addressSection'>Outputs: {voutList}</div>
 				<div>
 					<p>Fee: {this.props.transaction.fees}</p>
 				</div>

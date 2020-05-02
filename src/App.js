@@ -64,6 +64,7 @@ class App extends Component {
 			randomAssets: [],
 			search: '',
 			searchMatch: [],
+			latestBlock: 0,
 		};
 	}
 
@@ -89,13 +90,27 @@ class App extends Component {
 			newBlocksList.pop();
 		}
 
+		this.setState(
+			{
+				runningBlocks: newBlocksList,
+			},
+			() => this.setLatestBlock()
+		);
+	}
+
+	setLatestBlock() {
+		const blockHeights = [];
+
+		for (let i = 0; i < this.state.runningBlocks.length; i++) {
+			blockHeights.push(this.state.runningBlocks[i].height);
+		}
+
 		this.setState({
-			runningBlocks: newBlocksList,
+			latestBlock: Math.max(...blockHeights),
 		});
 	}
 
 	setStateElement(stateKey, item) {
-		let app = this;
 		let url = stateKeyURL[stateKey];
 
 		this.getAPIElement(url, item)
@@ -336,6 +351,7 @@ class App extends Component {
 
 		this.getAPIElement(statusURL, '').then((data) => {
 			latestBlock = data.info.blocks;
+			this.setState({ latestBlock: latestBlock });
 			callBlocks();
 		});
 	}
@@ -573,6 +589,7 @@ class App extends Component {
 											)}
 											onScroll={this.handleScroll}
 											clearBlock={this.clearBlock.bind(this)}
+											latestBlock={this.state.latestBlock}
 										/>
 									);
 								}}
