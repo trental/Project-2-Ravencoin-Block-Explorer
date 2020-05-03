@@ -1,0 +1,9 @@
+.mainAddressSection {
+	display: inline-block;
+	border: 2px;
+	padding: 10px;
+	margin: 3px;
+	width: 100%;
+	background: #dddddd;
+	vertical-align: top;
+}
