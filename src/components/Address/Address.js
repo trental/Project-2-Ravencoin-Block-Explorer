@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Transactions from '../Transactions/Transactions';
+import './Address.css';
 
 class Address extends Component {
 	constructor(props) {
@@ -22,8 +23,12 @@ class Address extends Component {
 	render() {
 		return (
 			<>
-				<div>
-					{this.props.address.addrStr} {this.props.address.balance}
+				<div className='mainAddressSection'>
+					<h3>{this.props.address.addrStr}</h3>
+					<p>Final Balance:{this.props.address.totalReceived} RVN</p>
+					<p>Final Balance:{this.props.address.totalSent} RVN</p>
+					<p>Final Balance:{this.props.address.balance} RVN</p>
+					<p>Transactions:{this.props.address.txApperances}</p>
 				</div>
 				<div>
 					<Transactions
@@ -33,7 +38,7 @@ class Address extends Component {
 					/>
 				</div>
 				<button onClick={() => this.props.setMoreAddressTransactions()}>
-					Click Me
+					Load More Transactions
 				</button>
 			</>
 		);

@@ -17,6 +17,7 @@ const apiUrl = 'https://ravenexplorer.net';
 const totalAssets = 23463;
 const randomAssetURL = '/api/assets?asset=*&size=1&skip=';
 const assetURL = '/api/assets?verbose=true&asset=';
+const assetSearchURL = '/api/assets?asset=';
 const addressURL = '/api/addr/';
 const blockIndexURL = '/api/block-index/';
 const blockHashURL = '/api/block/';
@@ -43,6 +44,14 @@ const emptyRunningTransactions = [
 	{ txid: 'i' },
 	{ txid: 'j' },
 ];
+
+const emptySearchTest = [
+	[],
+	['Not found'],
+	['Not found'],
+	['Not found'],
+	['Not found'],
+];
 const apiSpecialCharacter = ['#'];
 const apiSpecialMap = ['%23'];
 const urlSpecialCharacter = ['/', '#'];
@@ -64,6 +73,7 @@ class App extends Component {
 			randomAssets: [],
 			search: '',
 			searchMatch: [],
+			searchTest: emptySearchTest,
 			latestBlock: 0,
 		};
 	}
@@ -146,7 +156,10 @@ class App extends Component {
 	async setTransaction(transactionHash, { signal } = {}) {
 		const transactionData = await this.getAPIElement(txURL, transactionHash);
 
-		this.setState({ transactions: [transactionData] });
+		this.setState({
+			transaction: transactionData,
+			transactions: [transactionData],
+		});
 	}
 
 	clearBlock() {
@@ -324,6 +337,7 @@ class App extends Component {
 			this.getAPIElement(randomAssetURL, randomAsset).then((assetName) => {
 				this.getAPIElement(assetURL, assetName[0]).then((data) => {
 					const assetData = data[assetName[0]];
+					console.log(assetName[0]);
 					app.addStateElement('randomAssets', {
 						name: assetData.name,
 						link: convertToUrl(assetData.name),
@@ -413,86 +427,21 @@ class App extends Component {
 	}
 
 	clearThenSpeculativeSearch() {
-		this.setState({ searchMatch: [] }, () => {
+		this.setState({ searchTest: emptySearchTest }, () => {
 			this.speculativeSearch();
 		});
 	}
 
 	clearSearch() {
 		this.setState({ search: [] }, () => {
-			this.setState({ searchMatch: [] });
+			this.setState({ searchTest: emptySearchTest });
 		});
 	}
 
 	speculativeSearch() {
 		// search for Block, Transaction, Address, or Asset and build an array of all possible matches
 		if (this.state.search !== '') {
-			this.getAPIElement(blockHashURL, this.state.search)
-				.then((data) => {
-					if (JSON.stringify(data) !== '["Not found"]') {
-						let newBlockByHash = {
-							hash: data.hash,
-							blockHeight: data.height,
-							transactions: data.tx.length,
-						};
-						this.addSearchMatch('block', newBlockByHash);
-					}
-				})
-				.catch((error) => console.log(error));
-			this.getAPIElement(txURL, this.state.search)
-				.then((data) => {
-					if (JSON.stringify(data) !== '["Not found"]') {
-						let newTx = {
-							hash: data.txid,
-							blockHeight: data.blockHeight,
-							valueOut: data.valueOut,
-						};
-						this.addSearchMatch('tx', newTx);
-					}
-				})
-				.catch((error) => console.log(error));
-			this.getAPIElement(addressURL, this.state.search)
-				.then((data) => {
-					if (JSON.stringify(data) !== '["Not found"]') {
-						let newAddr = {
-							hash: data.addrStr,
-							transactions: data.transactions.length,
-							balance: data.balance,
-						};
-						this.addSearchMatch('addr', newAddr);
-					}
-				})
-				.catch((error) => console.log(error));
-			this.getAPIElement('/api/assets?asset=', this.state.search + '*')
-				.then((data) => {
-					if (JSON.stringify(data) !== JSON.stringify([])) {
-						for (let i = 0; i < data.length && i < 10; i++) {
-							let newAsset = {
-								hash: data[i],
-							};
-							this.addSearchMatch('asset', newAsset);
-						}
-					}
-				})
-				.catch((error) => console.log(error));
-			if (!isNaN(this.state.search)) {
-				this.getAPIElement(blockIndexURL, this.state.search)
-					.then((data) => {
-						this.getAPIElement(blockHashURL, data.blockHash)
-							.then((data) => {
-								if (JSON.stringify(data) !== '["Not found"]') {
-									let newBlockByHash = {
-										hash: data.hash,
-										blockHeight: data.height,
-										transactions: data.tx.length,
-									};
-									this.addSearchMatch('block', newBlockByHash);
-								}
-							})
-							.catch((error) => console.log(error));
-					})
-					.catch((error) => console.log(error));
-			}
+			this.fetchSearch(this.state.search);
 		}
 	}
 
@@ -504,13 +453,13 @@ class App extends Component {
 		} else if (props.target.dataset.category === 'tx') {
 			this.setTransaction(props.target.dataset.hash);
 		} else if (props.target.dataset.category === 'asset') {
-			this.setStateElement('asset', props.target.dataset.hash);
+			console.log(this.convertToUrlNew(props.target.dataset.hash));
+			this.setStateElement(
+				'asset',
+				this.convertToUrlNew(props.target.dataset.hash)
+			);
 		}
 
-		// this.setStateElement(
-		// 	props.target.dataset.category,
-		// 	props.target.dataset.hash
-		// );
 		this.clearSearch();
 	}
 
@@ -528,6 +477,79 @@ class App extends Component {
 		});
 	}
 
+	///// new search matching
+
+	replaceAtNew = (string, index, replace) => {
+		return string.substring(0, index) + replace + string.substring(index + 1);
+	};
+
+	convertToUrlNew = (inputString) => {
+		let position;
+		let outputString = inputString.slice();
+
+		for (let i = 0; i < urlSpecialCharacter.length; i++) {
+			position = outputString.indexOf(urlSpecialCharacter[i]);
+			while (position > 0) {
+				outputString = this.replaceAtNew(
+					outputString,
+					position,
+					urlSpecialMap[i]
+				);
+				position = outputString.indexOf(urlSpecialCharacter[i]);
+			}
+		}
+
+		return outputString;
+	};
+
+	async fetchSearch(searchTerm, { signal } = {}) {
+		let results = [];
+
+		const searchTrials = [
+			{
+				searchCategory: 'asset',
+				searchURL: assetSearchURL,
+			},
+			{
+				searchCategory: 'blockIndex',
+				searchURL: blockIndexURL,
+			},
+			{
+				searchCategory: 'blockHash',
+				searchURL: blockHashURL,
+			},
+			{
+				searchCategory: 'address',
+				searchURL: addressURL,
+			},
+			{
+				searchCategory: 'transaction',
+				searchURL: txURL,
+			},
+		];
+
+		const searchFetches = searchTrials.map(async (trial) => {
+			const response = await fetch(
+				apiUrl +
+					trial.searchURL +
+					this.convertToUrlNew(searchTerm) +
+					(trial.searchCategory === 'asset' ? '*' : ''),
+				{
+					signal,
+				}
+			).catch((error) => console.error('wow an error!', error));
+			return response.json();
+		});
+
+		this.setState({ searchTest: await Promise.all(searchFetches) });
+	}
+
+	setSearch({ signal } = {}) {
+		const searchData = this.fetchSearch(this.state.search, { signal });
+
+		return searchData;
+	}
+
 	//////////////////////
 	//
 	// Render, Router, Links
@@ -542,9 +564,10 @@ class App extends Component {
 						<nav>
 							<Header
 								handleChange={this.handleChange.bind(this)}
-								searchMatch={this.state.searchMatch}
+								searchTest={this.state.searchTest}
 								searchClicked={this.searchClicked.bind(this)}
 								search={this.state.search}
+								convertToUrlNew={this.convertToUrlNew.bind(this)}
 							/>
 						</nav>
 						<main>
@@ -569,6 +592,7 @@ class App extends Component {
 											transactions={this.state.transactions}
 											setAddress={this.setAddress.bind(this)}
 											setTransaction={this.setTransaction.bind(this)}
+											transaction={this.state.transaction}
 										/>
 									);
 								}}
