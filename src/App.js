@@ -337,7 +337,6 @@ class App extends Component {
 			this.getAPIElement(randomAssetURL, randomAsset).then((assetName) => {
 				this.getAPIElement(assetURL, assetName[0]).then((data) => {
 					const assetData = data[assetName[0]];
-					console.log(assetName[0]);
 					app.addStateElement('randomAssets', {
 						name: assetData.name,
 						link: convertToUrl(assetData.name),
@@ -453,7 +452,6 @@ class App extends Component {
 		} else if (props.target.dataset.category === 'tx') {
 			this.setTransaction(props.target.dataset.hash);
 		} else if (props.target.dataset.category === 'asset') {
-			console.log(this.convertToUrlNew(props.target.dataset.hash));
 			this.setStateElement(
 				'asset',
 				this.convertToUrlNew(props.target.dataset.hash)
@@ -503,8 +501,6 @@ class App extends Component {
 	};
 
 	async fetchSearch(searchTerm, { signal } = {}) {
-		let results = [];
-
 		const searchTrials = [
 			{
 				searchCategory: 'asset',
