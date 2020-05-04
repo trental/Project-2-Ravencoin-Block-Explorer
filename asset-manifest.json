@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/Project-2-Ravencoin-Block-Explorer/static/css/main.7043016a.chunk.css",
+    "main.js": "/Project-2-Ravencoin-Block-Explorer/static/js/main.3c2848a1.chunk.js",
+    "main.js.map": "/Project-2-Ravencoin-Block-Explorer/static/js/main.3c2848a1.chunk.js.map",
+    "runtime-main.js": "/Project-2-Ravencoin-Block-Explorer/static/js/runtime-main.98e4b349.js",
+    "runtime-main.js.map": "/Project-2-Ravencoin-Block-Explorer/static/js/runtime-main.98e4b349.js.map",
+    "static/js/2.66530fd7.chunk.js": "/Project-2-Ravencoin-Block-Explorer/static/js/2.66530fd7.chunk.js",
+    "static/js/2.66530fd7.chunk.js.map": "/Project-2-Ravencoin-Block-Explorer/static/js/2.66530fd7.chunk.js.map",
+    "index.html": "/Project-2-Ravencoin-Block-Explorer/index.html",
+    "precache-manifest.66ef17f774dff60e2700caa984b59e65.js": "/Project-2-Ravencoin-Block-Explorer/precache-manifest.66ef17f774dff60e2700caa984b59e65.js",
+    "service-worker.js": "/Project-2-Ravencoin-Block-Explorer/service-worker.js",
+    "static/css/main.7043016a.chunk.css.map": "/Project-2-Ravencoin-Block-Explorer/static/css/main.7043016a.chunk.css.map",
+    "static/js/2.66530fd7.chunk.js.LICENSE.txt": "/Project-2-Ravencoin-Block-Explorer/static/js/2.66530fd7.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.98e4b349.js",
+    "static/js/2.66530fd7.chunk.js",
+    "static/css/main.7043016a.chunk.css",
+    "static/js/main.3c2848a1.chunk.js"
+  ]
+}
