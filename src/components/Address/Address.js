@@ -37,7 +37,15 @@ class Address extends Component {
 						setAddress={this.props.setAddress}
 					/>
 				</div>
-				<button onClick={() => this.props.setMoreAddressTransactions()}>
+				<button
+					onClick={() => this.props.setMoreAddressTransactions()}
+					className={
+						this.props.transactions.length <
+						this.props.address.transactions.length
+							? ''
+							: 'hidden'
+					}>
+					{' '}
 					Load More Transactions
 				</button>
 			</>

@@ -57,7 +57,12 @@ class Block extends Component {
 				/>
 				<Button
 					variant='primary'
-					onClick={() => this.props.setMoreBlockTransactions()}>
+					onClick={() => this.props.setMoreBlockTransactions()}
+					className={
+						this.props.transactions.length < this.props.block.tx.length
+							? ''
+							: 'hidden'
+					}>
 					Load More Transactions
 				</Button>
 			</>
