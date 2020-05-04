@@ -6,7 +6,9 @@ const RunningBlocks = (props) => {
 		return (
 			<div key={block.height} className='dataRow'>
 				<div className='blockItem'>
-					<Link to={'/block/' + block.hash}>{block.height}</Link>
+					<Link to={props.hostingURL + '/block/' + block.hash}>
+						{block.height}
+					</Link>
 				</div>
 				<div className='blockItem'>{block.tx.length}</div>
 				<div className='blockItem'>{block.size}</div>

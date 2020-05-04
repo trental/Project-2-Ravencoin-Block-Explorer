@@ -15,6 +15,7 @@ const numRandomAssets = 10;
 const loadPerTime = 25;
 const apiUrl = 'https://ravenexplorer.net';
 const totalAssets = 23463;
+const hostingURL = '/Project-2-Ravencoin-Block-Explorer';
 const randomAssetURL = '/api/assets?asset=*&size=1&skip=';
 const assetURL = '/api/assets?verbose=true&asset=';
 const assetSearchURL = '/api/assets?asset=';
@@ -63,6 +64,7 @@ class App extends Component {
 		super(props);
 
 		this.state = {
+			hostingURL: hostingURL,
 			transaction: { vin: [], vout: [] },
 			runningTransactions: emptyRunningTransactions,
 			block: emptyBlock,
@@ -566,22 +568,24 @@ class App extends Component {
 								searchClicked={this.searchClicked.bind(this)}
 								search={this.state.search}
 								convertToUrlNew={this.convertToUrlNew.bind(this)}
+								hostingURL={this.state.hostingURL}
 							/>
 						</nav>
 						<main>
 							<Route
-								path='/Project-2-Ravencoin-Block-Explorer/'
+								path={hostingURL + '/'}
 								exact
 								render={(routerProps) => (
 									<Home
 										runningTransactions={this.state.runningTransactions}
 										runningBlocks={this.state.runningBlocks}
 										randomAssets={this.state.randomAssets}
+										hostingURL={this.state.hostingURL}
 									/>
 								)}
 							/>
 							<Route
-								path='/tx/:txHash'
+								path={hostingURL + '/tx/:txHash'}
 								render={(routerProps) => {
 									return (
 										<Transaction
@@ -591,12 +595,13 @@ class App extends Component {
 											setAddress={this.setAddress.bind(this)}
 											setTransaction={this.setTransaction.bind(this)}
 											transaction={this.state.transaction}
+											hostingURL={this.state.hostingURL}
 										/>
 									);
 								}}
 							/>
 							<Route
-								path='/block/:blockHash'
+								path={hostingURL + '/block/:blockHash'}
 								render={(routerProps) => {
 									return (
 										<Block
@@ -612,12 +617,13 @@ class App extends Component {
 											onScroll={this.handleScroll}
 											clearBlock={this.clearBlock.bind(this)}
 											latestBlock={this.state.latestBlock}
+											hostingURL={this.state.hostingURL}
 										/>
 									);
 								}}
 							/>
 							<Route
-								path='/addr/:address'
+								path={hostingURL + '/addr/:address'}
 								render={(routerProps) => {
 									return (
 										<Address
@@ -630,18 +636,20 @@ class App extends Component {
 											setMoreAddressTransactions={this.setMoreAddressTransactions.bind(
 												this
 											)}
+											hostingURL={this.state.hostingURL}
 										/>
 									);
 								}}
 							/>
 							<Route
-								path='/asset/:asset'
+								path={hostingURL + '/asset/:asset'}
 								render={(routerProps) => {
 									return (
 										<Asset
 											match={routerProps.match}
 											setStateElement={this.setStateElement.bind(this)}
 											asset={this.state.asset}
+											hostingURL={this.state.hostingURL}
 										/>
 									);
 								}}

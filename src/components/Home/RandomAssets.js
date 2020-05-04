@@ -6,7 +6,9 @@ const RandomAssets = (props) => {
 		return (
 			<div key={asset.name} className='dataRow'>
 				<div className='assetItem'>
-					<Link to={'/asset/' + asset.link}>{asset.name}</Link>
+					<Link to={props.hostingURL + '/asset/' + asset.link}>
+						{asset.name}
+					</Link>
 				</div>
 				<div className='assetItem'>{asset.amount}</div>
 				<div className='assetItem'>{asset.block}</div>

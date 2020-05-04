@@ -18,7 +18,12 @@ class Asset extends Component {
 				<p>block_height: {this.props.asset[asset].block_height}</p>
 				<p>
 					blockhash:{' '}
-					<Link to={'/block/' + this.props.asset[asset].blockhash}>
+					<Link
+						to={
+							this.props.hostingURL +
+							'/block/' +
+							this.props.asset[asset].blockhash
+						}>
 						{this.props.asset[asset].blockhash}
 					</Link>
 				</p>

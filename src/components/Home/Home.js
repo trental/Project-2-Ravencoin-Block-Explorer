@@ -8,13 +8,22 @@ const Home = (props) => {
 	return (
 		<div>
 			<div className='homeSection runningBlocks'>
-				<RunningBlocks runningBlocks={props.runningBlocks} />
+				<RunningBlocks
+					runningBlocks={props.runningBlocks}
+					hostingURL={props.hostingURL}
+				/>
 			</div>
 			<div className='homeSection runningTransactions'>
-				<RunningTransactions runningTransactions={props.runningTransactions} />
+				<RunningTransactions
+					runningTransactions={props.runningTransactions}
+					hostingURL={props.hostingURL}
+				/>
 			</div>
 			<div className='homeSection randomAssets'>
-				<RandomAssets randomAssets={props.randomAssets} />
+				<RandomAssets
+					randomAssets={props.randomAssets}
+					hostingURL={props.hostingURL}
+				/>
 			</div>
 		</div>
 	);

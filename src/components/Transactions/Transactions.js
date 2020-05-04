@@ -11,6 +11,7 @@ class Transactions extends Component {
 						transaction={tx}
 						setStateElement={this.props.setStateElement}
 						setAddress={this.props.setAddress}
+						hostingURL={this.props.hostingURL}
 					/>
 				</div>
 			);

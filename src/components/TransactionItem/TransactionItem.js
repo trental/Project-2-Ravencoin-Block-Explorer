@@ -11,7 +11,7 @@ class TransactionItem extends Component {
 				return (
 					<div key={addrIn.n}>
 						<Link
-							to={'/addr/' + addrIn.addr}
+							to={this.props.hostingURL + '/addr/' + addrIn.addr}
 							onClick={() => this.props.setAddress(addrIn.addr)}>
 							{addrIn.addr}
 						</Link>{' '}
@@ -25,7 +25,11 @@ class TransactionItem extends Component {
 				return (
 					<div key={addrOut.n}>
 						<Link
-							to={'/addr/' + addrOut.scriptPubKey.addresses[0]}
+							to={
+								this.props.hostingURL +
+								'/addr/' +
+								addrOut.scriptPubKey.addresses[0]
+							}
 							onClick={() =>
 								this.props.setAddress(addrOut.scriptPubKey.addresses[0])
 							}>
@@ -43,7 +47,8 @@ class TransactionItem extends Component {
 				<div>
 					<p>
 						Transaction:{' '}
-						<Link to={'/tx/' + this.props.transaction.txid}>
+						<Link
+							to={this.props.hostingURL + '/tx/' + this.props.transaction.txid}>
 							{this.props.transaction.txid}
 						</Link>
 					</p>

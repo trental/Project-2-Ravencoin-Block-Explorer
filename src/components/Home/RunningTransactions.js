@@ -6,7 +6,7 @@ const RunningTransactions = (props) => {
 		return (
 			<div key={tx.txid} className='dataRow'>
 				<div className='transactionItem'>
-					<Link to={'/tx/' + tx.txid}>
+					<Link to={props.hostingURL + '/tx/' + tx.txid}>
 						{tx.txid.length !== 1 ? tx.txid.substring(0, 40) + '...' : ''}
 					</Link>
 				</div>
