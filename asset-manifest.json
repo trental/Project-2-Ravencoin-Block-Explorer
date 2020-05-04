@@ -1,22 +1,22 @@
 {
   "files": {
-    "main.css": "/static/css/main.7043016a.chunk.css",
-    "main.js": "/static/js/main.ba611b9b.chunk.js",
-    "main.js.map": "/static/js/main.ba611b9b.chunk.js.map",
-    "runtime-main.js": "/static/js/runtime-main.4b8e3499.js",
-    "runtime-main.js.map": "/static/js/runtime-main.4b8e3499.js.map",
-    "static/js/2.acf0bdfe.chunk.js": "/static/js/2.acf0bdfe.chunk.js",
-    "static/js/2.acf0bdfe.chunk.js.map": "/static/js/2.acf0bdfe.chunk.js.map",
-    "index.html": "/index.html",
-    "precache-manifest.978a4d1dc0a331835810acb75471f27b.js": "/precache-manifest.978a4d1dc0a331835810acb75471f27b.js",
-    "service-worker.js": "/service-worker.js",
-    "static/css/main.7043016a.chunk.css.map": "/static/css/main.7043016a.chunk.css.map",
-    "static/js/2.acf0bdfe.chunk.js.LICENSE.txt": "/static/js/2.acf0bdfe.chunk.js.LICENSE.txt"
+    "main.css": "/Project-2-Ravencoin-Block-Explorer/static/css/main.7043016a.chunk.css",
+    "main.js": "/Project-2-Ravencoin-Block-Explorer/static/js/main.a8a8cdef.chunk.js",
+    "main.js.map": "/Project-2-Ravencoin-Block-Explorer/static/js/main.a8a8cdef.chunk.js.map",
+    "runtime-main.js": "/Project-2-Ravencoin-Block-Explorer/static/js/runtime-main.98e4b349.js",
+    "runtime-main.js.map": "/Project-2-Ravencoin-Block-Explorer/static/js/runtime-main.98e4b349.js.map",
+    "static/js/2.66530fd7.chunk.js": "/Project-2-Ravencoin-Block-Explorer/static/js/2.66530fd7.chunk.js",
+    "static/js/2.66530fd7.chunk.js.map": "/Project-2-Ravencoin-Block-Explorer/static/js/2.66530fd7.chunk.js.map",
+    "index.html": "/Project-2-Ravencoin-Block-Explorer/index.html",
+    "precache-manifest.debfacb87fa5847066229bb00710d41a.js": "/Project-2-Ravencoin-Block-Explorer/precache-manifest.debfacb87fa5847066229bb00710d41a.js",
+    "service-worker.js": "/Project-2-Ravencoin-Block-Explorer/service-worker.js",
+    "static/css/main.7043016a.chunk.css.map": "/Project-2-Ravencoin-Block-Explorer/static/css/main.7043016a.chunk.css.map",
+    "static/js/2.66530fd7.chunk.js.LICENSE.txt": "/Project-2-Ravencoin-Block-Explorer/static/js/2.66530fd7.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
-    "static/js/runtime-main.4b8e3499.js",
-    "static/js/2.acf0bdfe.chunk.js",
+    "static/js/runtime-main.98e4b349.js",
+    "static/js/2.66530fd7.chunk.js",
     "static/css/main.7043016a.chunk.css",
-    "static/js/main.ba611b9b.chunk.js"
+    "static/js/main.a8a8cdef.chunk.js"
   ]
 }
