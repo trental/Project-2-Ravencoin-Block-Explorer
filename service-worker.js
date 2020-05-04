@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/Project-2-Ravencoin-Block-Explorer/precache-manifest.3aa5661896502ff9902175e4022630ce.js"
+  "/Project-2-Ravencoin-Block-Explorer/precache-manifest.1bfe2df2d664014f057eedbb51cb1d38.js"
 );
 
 self.addEventListener('message', (event) => {
