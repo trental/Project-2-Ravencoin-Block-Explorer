@@ -1,71 +1,61 @@
-# Project-2-Ravencoin-Block-Explorer
+# Project 2 Ravencoin Block Explorer
 
-Block Explorer for the Ravencoin blockchain
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Description
 
-## Available Scripts
+Ravencoin is a fork of the Bitcoin cryptocurrency codebase. Therefore, as Ravencoin is a blockchain protocol, it allows viewing of all transactions in its blockchain database. This webapp is built as a viewer of the history of the RVN blockchain data by searching for:
 
-In the project directory, you can run:
+- Block by height or hash
+- Transaction hash
+- Address
+- Asset
 
-### `npm start`
+In addition to being a project of personal interest, this web app fulfills the first project requirement for the [General Assembly Software Immersive Engineer Remote course](https://generalassemb.ly/education/software-engineering-immersive-remote).
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Structure
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+This web app explores the blockchain through two main methods:
 
-### `npm test`
+- Latest blocks, transactions, or randomly listed assets
+- Search for block, transaction, or asset
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Technologies Used
 
-### `npm run build`
+Tools used in this project so far are those covered in the first six weeks of the GA SEIR course.
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- React
+- API
+- HTML5
+- CSS
+- Javascript
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+## Approach
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+I've approached this coding challenge using React and React router to navigate the data contained in the RVN blockchain.
 
-### `npm run eject`
+There are five main views of the data:
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+- Latest running blocks and transactions on the landing page which links to detail for each
+- Block detail (searchable by block height or hash) listing all contained transactions along with input & output address and RVN amounts
+- Address detail (searchable by address) listing all relevant transactions along with input & output address and RVN amounts
+- Transaction detail (searchable by transaction hash) listing all input & output addresses as well as link to the containing block
+- Asset detail (searchable by asset name) containing summary information about the asset as well a link to the originating block
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Incomplete Items
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+A few things that bug me:
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+- Asset transfers are not included in the transactional detail
+- Asset detail doesn't list holding addresses or transactions - this will require updating of the API
+- It is all text and not very fun to look at
+- I'm using DOM manipulation outside of React in one place to load a 3rd party socket script
+- There's a lurking bug that generates an error on page load about 10% of the time
 
-## Learn More
+In general I like the size of this project at this point because it has me thinking about larger-scale organization for easier maintenance and troubleshooting.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Installation
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Use this app by visiting its hosted site [here](https://trental.github.io/Project-2-Ravencoin-Block-Explorer) at github or by cloning the [repository](https://github.com/trental/Project-2-Ravencoin-Block-Explorer.git) and running it yourself.
 
-### Code Splitting
+## Contribution Guidelines
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+Suggestions and contributions to this code are welcome! Please submit issues or pull-requests for errors or desired code enhancements!

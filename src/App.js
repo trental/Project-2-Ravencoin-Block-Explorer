@@ -76,6 +76,8 @@ class App extends Component {
 			searchTest: emptySearchTest,
 			latestBlock: 0,
 		};
+
+		this.myRef = React.createRef();
 	}
 
 	addRunningTransaction(newTransaction) {
@@ -568,7 +570,7 @@ class App extends Component {
 						</nav>
 						<main>
 							<Route
-								path='/'
+								path='/Project-2-Ravencoin-Block-Explorer/'
 								exact
 								render={(routerProps) => (
 									<Home

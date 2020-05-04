@@ -7,3 +7,7 @@
 	background: #dddddd;
 	vertical-align: top;
 }
+
+.hidden {
+	display: none;
+}
