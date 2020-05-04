@@ -85,9 +85,7 @@ const Header = (props) => {
 		<Styles>
 			<Navbar expand='lg' fixed='top'>
 				<Navbar.Brand>
-					<Link to='/Project-2-Ravencoin-Block-Explorer/'>
-						Ravencoin Explorer
-					</Link>
+					<Link to='/'>Ravencoin Explorer</Link>
 				</Navbar.Brand>
 				<Nav className='ml-auto'>
 					<input
