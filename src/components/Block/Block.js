@@ -31,7 +31,11 @@ class Block extends Component {
 					<div className='blockNav'>
 						<div className='previousBlock'>
 							<Link
-								to={'/block/' + this.props.block.previousblockhash}
+								to={
+									this.props.hostingURL +
+									'/block/' +
+									this.props.block.previousblockhash
+								}
 								onClick={() =>
 									this.props.setBlock(this.props.block.previousblockhash)
 								}>
@@ -41,7 +45,11 @@ class Block extends Component {
 						<div className='nextBlock'>
 							{' '}
 							<Link
-								to={'/block/' + this.props.block.nextblockhash}
+								to={
+									this.props.hostingURL +
+									'/block/' +
+									this.props.block.nextblockhash
+								}
 								onClick={() =>
 									this.props.setBlock(this.props.block.nextblockhash)
 								}>
@@ -54,6 +62,7 @@ class Block extends Component {
 					transactions={this.props.transactions}
 					setStateElement={this.props.setStateElement}
 					setAddress={this.props.setAddress}
+					hostingURL={this.props.hostingURL}
 				/>
 				<Button
 					variant='primary'

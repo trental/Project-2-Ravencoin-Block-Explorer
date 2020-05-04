@@ -24,7 +24,7 @@ const Header = (props) => {
 	const list0 = props.searchTest[0].slice(0, 10).map((item) => (
 		<div key={item}>
 			<Link
-				to={'/asset/' + props.convertToUrlNew(item)}
+				to={props.hostingURL + '/asset/' + props.convertToUrlNew(item)}
 				onClick={props.searchClicked}
 				data-category='asset'
 				data-hash={item}>
@@ -35,7 +35,7 @@ const Header = (props) => {
 	const list1 =
 		JSON.stringify(props.searchTest[1]) !== JSON.stringify(['Not found']) ? (
 			<Link
-				to={'/block/' + props.searchTest[1].blockHash}
+				to={props.hostingURL + '/block/' + props.searchTest[1].blockHash}
 				onClick={props.searchClicked}
 				data-category='block'
 				data-hash={props.searchTest[1].blockHash}>
@@ -47,7 +47,7 @@ const Header = (props) => {
 	const list2 =
 		JSON.stringify(props.searchTest[2]) !== JSON.stringify(['Not found']) ? (
 			<Link
-				to={'/block/' + props.searchTest[2].hash}
+				to={props.hostingURL + '/block/' + props.searchTest[2].hash}
 				onClick={props.searchClicked}
 				data-category='block'
 				data-hash={props.searchTest[2].hash}>
@@ -59,7 +59,7 @@ const Header = (props) => {
 	const list3 =
 		JSON.stringify(props.searchTest[3]) !== JSON.stringify(['Not found']) ? (
 			<Link
-				to={'/addr/' + props.searchTest[3].addrStr}
+				to={props.hostingURL + '/addr/' + props.searchTest[3].addrStr}
 				onClick={props.searchClicked}
 				data-category='address'
 				data-hash={props.searchTest[3].addrStr}>
@@ -71,7 +71,7 @@ const Header = (props) => {
 	const list4 =
 		JSON.stringify(props.searchTest[4]) !== JSON.stringify(['Not found']) ? (
 			<Link
-				to={'/tx/' + props.searchTest[4].txid}
+				to={props.hostingURL + '/tx/' + props.searchTest[4].txid}
 				onClick={props.searchClicked}
 				data-category='tx'
 				data-hash={props.searchTest[4].txid}>

@@ -30,7 +30,12 @@ class Transaction extends Component {
 					<p>
 						Included in Block:{' '}
 						{this.props.transaction.blockhash ? (
-							<Link to={'/block/' + this.props.transaction.blockhash}>
+							<Link
+								to={
+									this.props.hostingURL +
+									'/block/' +
+									this.props.transaction.blockhash
+								}>
 								{this.props.transaction.blockhash}
 							</Link>
 						) : (
@@ -42,6 +47,7 @@ class Transaction extends Component {
 					transactions={this.props.transactions}
 					setStateElement={this.props.setStateElement}
 					setAddress={this.props.setAddress}
+					hostingURL={this.props.hostingURL}
 				/>
 			</>
 		);

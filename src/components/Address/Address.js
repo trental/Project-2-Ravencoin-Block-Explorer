@@ -35,6 +35,7 @@ class Address extends Component {
 						transactions={this.props.transactions}
 						setStateElement={this.props.setStateElement}
 						setAddress={this.props.setAddress}
+						hostingURL={this.props.hostingURL}
 					/>
 				</div>
 				<button
