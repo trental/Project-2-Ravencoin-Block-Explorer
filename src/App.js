@@ -15,7 +15,7 @@ const numRandomAssets = 10;
 const loadPerTime = 25;
 const apiUrl = 'https://ravenexplorer.net';
 const totalAssets = 23463;
-const hostingURL = 'Project-2-Ravencoin-Block-Explorer';
+const hostingURL = '';
 const randomAssetURL = '/api/assets?asset=*&size=1&skip=';
 const assetURL = '/api/assets?verbose=true&asset=';
 const assetSearchURL = '/api/assets?asset=';
@@ -64,7 +64,7 @@ class App extends Component {
 		super(props);
 
 		this.state = {
-			hostingURL: hostingURL,
+			hostingURL: '',
 			transaction: { vin: [], vout: [] },
 			runningTransactions: emptyRunningTransactions,
 			block: emptyBlock,
