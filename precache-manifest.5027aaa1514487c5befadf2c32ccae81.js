@@ -1,10 +1,10 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "5783c63c569b8074b69ef7ec4b36e2cd",
+    "revision": "e1bf893072bfc1c09faad3f49d4efd02",
     "url": "/Project-2-Ravencoin-Block-Explorer/index.html"
   },
   {
-    "revision": "f034518aa549f99689f2",
+    "revision": "00e951d21d0d0521011d",
     "url": "/Project-2-Ravencoin-Block-Explorer/static/css/main.694dcbbb.chunk.css"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/Project-2-Ravencoin-Block-Explorer/static/js/2.66530fd7.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "f034518aa549f99689f2",
-    "url": "/Project-2-Ravencoin-Block-Explorer/static/js/main.4f219032.chunk.js"
+    "revision": "00e951d21d0d0521011d",
+    "url": "/Project-2-Ravencoin-Block-Explorer/static/js/main.d12b04dd.chunk.js"
   },
   {
     "revision": "b4ac191cfaa0eea04609",
